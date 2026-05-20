@@ -169,40 +169,49 @@ Open `index.html`, find the existing standalone-mode block, replace it with the 
     margin: 0 auto;
     background: #1F2937;
     color: #fff;
-    border-radius: 14px;
-    padding: 14px 36px 14px 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.28);
     z-index: 1000;
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.45;
     font-family: 'Inter', system-ui, sans-serif;
   }
   .install-banner[hidden] { display: none; }
   .install-banner-close {
-    position: absolute; top: 6px; right: 8px;
-    background: transparent; border: none; color: #fff;
-    font-size: 20px; line-height: 1; cursor: pointer;
-    padding: 4px 8px;
+    position: absolute; top: 8px; right: 10px;
+    background: transparent; border: none; color: #9CA3AF;
+    font-size: 24px; line-height: 1; cursor: pointer;
+    padding: 6px 10px;
   }
-  .install-banner-title { font-weight: 600; margin-bottom: 4px; }
+  .install-banner-close:hover, .install-banner-close:active { color: #fff; }
+  .install-banner-title { font-weight: 700; font-size: 15px; margin: 0 0 2px 0; padding-right: 30px; }
+  .install-banner-subtitle { font-size: 12px; color: #9CA3AF; margin: 0 0 14px 0; }
+  .install-banner-steps { display: flex; flex-direction: column; gap: 9px; }
+  .install-banner-step { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .install-banner-step-num {
+    flex-shrink: 0; width: 20px; height: 20px;
+    background: #374151; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .install-banner-step-text { flex: 1; }
+  .ios-share-icon { display: inline-block; vertical-align: -4px; width: 16px; height: 16px; }
   .install-banner-btn {
-    margin-top: 10px;
+    margin-top: 12px; width: 100%;
     background: #fff; color: #1F2937;
-    border: none; padding: 8px 14px;
-    border-radius: 8px; font-weight: 600;
-    font-size: 13px; cursor: pointer;
+    border: none; padding: 11px 14px;
+    border-radius: 10px; font-weight: 600;
+    font-size: 14px; cursor: pointer;
     font-family: inherit;
   }
-  .ios-share-icon {
-    display: inline-block; vertical-align: -3px;
-    width: 14px; height: 14px;
-  }
+  .install-banner-btn:hover, .install-banner-btn:active { background: #F3F4F6; }
   @media (display-mode: standalone), (display-mode: fullscreen) {
     .install-banner { display: none !important; }
   }
 </style>
 
-<div id="install-banner" hidden>
+<div id="install-banner" class="install-banner" hidden>
   <button class="install-banner-close" aria-label="Dismiss">×</button>
   <div class="install-banner-content"></div>
 </div>
@@ -230,10 +239,25 @@ Open `index.html`, find the existing standalone-mode block, replace it with the 
 
     if (isIOS) {
       content.innerHTML =
-        '<div class="install-banner-title">Install NestorAI</div>' +
-        'Tap <svg class="ios-share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-        '<path d="M12 2v14"/><path d="M5 9l7-7 7 7"/><path d="M5 21h14v-7"/></svg> ' +
-        'below, then <strong>Add to Home Screen</strong> for the full app experience.';
+        '<div class="install-banner-title">Install NestorAI on your phone</div>' +
+        '<div class="install-banner-subtitle">Fullscreen, no browser bar</div>' +
+        '<div class="install-banner-steps">' +
+          '<div class="install-banner-step">' +
+            '<span class="install-banner-step-num">1</span>' +
+            '<span class="install-banner-step-text">Tap ' +
+              '<svg class="ios-share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M5 11v10h14V11"/><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/>' +
+              '</svg> in Safari\'s toolbar</span>' +
+          '</div>' +
+          '<div class="install-banner-step">' +
+            '<span class="install-banner-step-num">2</span>' +
+            '<span class="install-banner-step-text">Choose <strong>Add to Home Screen</strong></span>' +
+          '</div>' +
+          '<div class="install-banner-step">' +
+            '<span class="install-banner-step-num">3</span>' +
+            '<span class="install-banner-step-text">Tap <strong>Add</strong> (top right)</span>' +
+          '</div>' +
+        '</div>';
       setTimeout(function () { banner.hidden = false; }, 1500);
     } else {
       window.addEventListener('beforeinstallprompt', function (e) {
@@ -241,8 +265,8 @@ Open `index.html`, find the existing standalone-mode block, replace it with the 
         var deferredPrompt = e;
         content.innerHTML =
           '<div class="install-banner-title">Install NestorAI</div>' +
-          'Install NestorAI as an app for a faster, fullscreen experience.' +
-          '<br><button class="install-banner-btn" id="install-trigger">Install</button>';
+          '<div class="install-banner-subtitle">Faster, fullscreen experience</div>' +
+          '<button class="install-banner-btn" id="install-trigger">Install</button>';
         banner.hidden = false;
         document.getElementById('install-trigger').addEventListener('click', function () {
           if (!deferredPrompt) return;
