@@ -30,6 +30,6 @@
 
 ## Phase 7: Deploy + iPhone smoke test
 
-- [ ] 7.1 Commit + push to `main` to trigger the GitHub Actions Pages deploy — [plan §Phase 7]
-- [ ] 7.2 Wait for the workflow to complete green, then run the iPhone smoke checklist on the live URL — [plan §Phase 7] / [spec: all scenarios end-to-end including new Mobile-Viewport + Modal Inputs requirements]
-- [ ] 7.3 Record results and confirm gate before re-sharing the URL with Nora — [plan §Phase 7]
+- [x] 7.1 Commit + push to `main` to trigger the GitHub Actions Pages deploy (done 2026-05-20)
+- [x] 7.2 iPhone smoke test on live URL: install flow works, banner renders correctly (after banner-bug fix + sessionStorage change), mobile margins OK, modal inputs sized correctly. Confirmed by Vlad 2026-05-20
+- [x] 7.3 Confirmed ready to share with Nora — install-ux-fixes scope complete
