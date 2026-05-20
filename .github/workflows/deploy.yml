@@ -1,0 +1,53 @@
+name: Deploy PWA to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Stage PWA assets
+        run: |
+          mkdir -p _dist
+          cp index.html               _dist/
+          cp manifest.webmanifest     _dist/
+          cp service-worker.js        _dist/
+          cp -R icons                 _dist/
+          # Tells Pages not to run Jekyll (also a no-op for actions-based deploy).
+          touch _dist/.nojekyll
+          # Include the source prototype for reference (optional).
+          cp 2026-05-19-mvp-showing.html _dist/
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
