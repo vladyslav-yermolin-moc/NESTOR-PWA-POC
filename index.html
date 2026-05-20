@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NestorAI — Prototype</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1F2937">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NestorAI">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #111827;
+    background: radial-gradient(circle at 50% 50%, #fff, transparent 70%), linear-gradient(180deg, #F3F4F6, #E5E7EB);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .screen { display: none; animation: fadeIn 0.25s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Phone frame */
+  .phone {
+    width: 360px;
+    background: #FFFFFF;
+    border-radius: 32px;
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.18), 0 0 0 8px #1F2937;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    height: 720px;
+    position: relative;
+  }
+  .phone-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-bottom: 1px solid #F3F4F6;
+    flex-shrink: 0;
+  }
+  .phone-brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+  .phone-logo {
+    width: 22px; height: 22px; border: 1.5px solid #1F2937; border-radius: 4px;
+    position: relative; flex-shrink: 0;
+  }
+  .phone-logo::before, .phone-logo::after {
+    content: ''; position: absolute; width: 18px; height: 1.5px; background: #1F2937;
+    top: 50%; left: 50%; transform-origin: center;
+  }
+  .phone-logo::before { transform: translate(-50%, -50%) rotate(45deg); }
+  .phone-logo::after { transform: translate(-50%, -50%) rotate(-45deg); }
+  .phone-content {
+    flex: 1; padding: 16px; overflow-y: auto;
+    background: #FFFFFF;
+  }
+  .phone-content::-webkit-scrollbar { width: 4px; }
+  .phone-content::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 2px; }
+  .phone-input {
+    border-top: 1px solid #F3F4F6; padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    background: #FAFAFA;
+    font-size: 13px; color: #6B7280;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    margin: 12px;
+    flex-shrink: 0;
+  }
+  .phone-footer {
+    background: #6B7280; color: #fff; padding: 8px 16px;
+    font-size: 9px; line-height: 1.4; text-align: center;
+    flex-shrink: 0;
+  }
+
+  /* Chat bubbles */
+  .bubble-bot {
+    background: #F3F4F6; padding: 10px 12px; border-radius: 14px 14px 14px 4px;
+    font-size: 13px; line-height: 1.45; max-width: 85%;
+    margin-bottom: 8px;
+  }
+  .bubble-user {
+    background: #1F2937; color: #fff; padding: 10px 12px; border-radius: 14px 14px 4px 14px;
+    font-size: 13px; line-height: 1.45; max-width: 85%;
+    margin-bottom: 8px; margin-left: auto;
+  }
+
+  /* Listing card */
+  .lc {
+    border: 1px solid #E5E7EB; border-radius: 12px; padding: 12px;
+    font-size: 12px; margin-bottom: 8px; background: #fff;
+  }
+  .lc-img {
+    height: 80px; background: linear-gradient(135deg, #E5E7EB, #F3F4F6);
+    border-radius: 8px; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #9CA3AF; font-size: 10px;
+  }
+  .price { font-weight: 600; font-size: 13px; }
+  .meta { color: #6B7280; font-size: 11px; }
+
+  /* Chips */
+  .chip {
+    display: inline-block; padding: 6px 12px; border: 1px solid #D1D5DB;
+    border-radius: 20px; font-size: 12px; margin: 4px 4px 4px 0; background: #fff;
+    color: #1F2937; transition: all 0.15s;
+  }
+  .chip-selected { background: #1F2937; color: #fff; border-color: #1F2937; }
+
+  /* Action buttons */
+  .action-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 10px 12px; border-radius: 10px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    margin-bottom: 6px; border: 1px solid #1F2937;
+    background: #1F2937; color: #fff;
+  }
+  .action-btn.free { background: #fff; color: #1F2937; }
+  .action-btn .lock { font-size: 10px; font-weight: 500; opacity: 0.85; }
+
+  /* Clickable hotspot */
+  [data-goto] { cursor: pointer; position: relative; transition: transform 0.15s; }
+  [data-goto]:hover { transform: scale(1.02); }
+
+  /* Typing dots */
+  @keyframes typingDot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+  .typing-dots { display: inline-flex; gap: 3px; align-items: center; padding: 0 4px; }
+  .typing-dots span { width: 6px; height: 6px; background: #9CA3AF; border-radius: 50%; animation: typingDot 1.4s infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* Progress bar */
+  @keyframes progress { from { width: 0%; } to { width: 100%; } }
+
+  /* Disclosure block */
+  .disclosure {
+    background: #FAFAFA; border: 1px solid #E5E7EB; border-radius: 10px;
+    padding: 12px; font-size: 11px; line-height: 1.5; color: #374151;
+    margin-bottom: 8px;
+  }
+  .disclosure-title {
+    font-weight: 600; color: #111827; font-size: 12px; margin-bottom: 6px;
+  }
+  .disclosure ul { padding-left: 16px; margin: 4px 0; }
+  .disclosure li { margin-bottom: 3px; }
+
+  /* OAuth buttons */
+  .oauth-btn {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border: 1px solid #D1D5DB; border-radius: 8px;
+    background: #fff; font-size: 12px; font-weight: 500;
+    cursor: pointer; margin-bottom: 6px; color: #111827;
+  }
+  .oauth-btn:hover { background: #FAFAFA; }
+
+  /* Tier badges */
+  .tier {
+    background: #fff; border: 1px solid #E5E7EB; border-radius: 12px;
+    padding: 12px; margin-bottom: 10px;
+  }
+  .tier-name { font-weight: 700; color: #111827; font-size: 14px; margin-bottom: 4px; }
+  .tier-price { font-size: 12px; color: #6B7280; margin-bottom: 8px; }
+  .tier ul { padding-left: 16px; margin: 0; font-size: 11px; line-height: 1.6; color: #374151; }
+
+  /* Utility classes */
+  .text-link { color: #2563EB; }
+  .text-muted { color: #6B7280; }
+  .text-ok { color: #10B981; }
+  .text-bad { color: #EF4444; }
+  .text-xs { font-size: 11px; }
+  .text-sm { font-size: 13px; }
+  .text-lg { font-size: 16px; }
+  .text-2xl { font-size: 20px; }
+  .font-semibold { font-weight: 600; }
+  .font-bold { font-weight: 700; }
+  .font-medium { font-weight: 500; }
+  .text-center { text-align: center; }
+  .text-right { text-align: right; }
+  .line-through { text-decoration: line-through; }
+  .underline { text-decoration: underline; }
+  .uppercase { text-transform: uppercase; }
+  .leading-tight { line-height: 1.2; }
+  .leading-relaxed { line-height: 1.55; }
+  .mb-1 { margin-bottom: 4px; }
+  .mb-2 { margin-bottom: 8px; }
+  .mb-3 { margin-bottom: 12px; }
+  .mb-4 { margin-bottom: 16px; }
+  .mt-1 { margin-top: 4px; }
+  .mt-2 { margin-top: 8px; }
+  .mt-3 { margin-top: 12px; }
+  .mt-4 { margin-top: 16px; }
+  .p-2 { padding: 8px; }
+  .p-3 { padding: 12px; }
+  .p-4 { padding: 16px; }
+  .py-1 { padding-top: 4px; padding-bottom: 4px; }
+  .py-2 { padding-top: 8px; padding-bottom: 8px; }
+  .py-3 { padding-top: 12px; padding-bottom: 12px; }
+  .px-2 { padding-left: 8px; padding-right: 8px; }
+  .gap-1 { gap: 4px; }
+  .gap-2 { gap: 8px; }
+  .gap-3 { gap: 12px; }
+  .flex { display: flex; }
+  .flex-1 { flex: 1; }
+  .flex-wrap { flex-wrap: wrap; }
+  .items-start { align-items: flex-start; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .justify-center { justify-content: center; }
+  .rounded { border-radius: 6px; }
+  .rounded-lg { border-radius: 8px; }
+  .rounded-xl { border-radius: 12px; }
+  .rounded-full { border-radius: 50%; }
+  .border { border: 1px solid #E5E7EB; }
+  .border-line { border-color: #E5E7EB; }
+  .border-b { border-bottom: 1px solid #E5E7EB; }
+  .bg-soft { background: #F3F4F6; }
+  .bg-white { background: #fff; }
+  .bg-ink { background: #1F2937; }
+  .text-white { color: #fff; }
+  .w-full { width: 100%; }
+  .w-8 { width: 32px; }
+  .w-10 { width: 40px; }
+  .h-1 { height: 4px; }
+  .h-8 { height: 32px; }
+  .h-10 { height: 40px; }
+  .h-full { height: 100%; }
+  .overflow-hidden { overflow: hidden; }
+  .space-y-1 > * + * { margin-top: 4px; }
+  .space-y-2 > * + * { margin-top: 8px; }
+  .border-dashed { border-style: dashed; }
+  .border-2 { border-width: 2px; }
+
+  /* ── Schedule Showing modal ── */
+  .showing-modal-overlay {
+    position: absolute; inset: 0; z-index: 200;
+    background: rgba(0, 0, 0, 0.40);
+    display: none; align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  .showing-modal-overlay.open { display: flex; }
+  .showing-modal {
+    background: #fff; border-radius: 20px;
+    width: 100%; max-height: calc(100% - 32px);
+    overflow-y: auto;
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  }
+  .showing-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .showing-modal-title {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 700; font-size: 15px; color: #111827;
+  }
+  .showing-modal-close {
+    width: 28px; height: 28px; border: none; background: none;
+    font-size: 18px; color: #6B7280; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+  }
+  .showing-modal-close:hover { background: #F3F4F6; }
+
+  .showing-property-card {
+    display: flex; align-items: center; gap: 12px;
+    border: 1px solid #E5E7EB; border-radius: 12px;
+    padding: 10px; margin-bottom: 16px; background: #FAFAFA;
+  }
+  .showing-property-thumb {
+    width: 64px; height: 64px; flex-shrink: 0;
+    border-radius: 8px; overflow: hidden;
+    background: linear-gradient(135deg, #D1D5DB, #E5E7EB);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .showing-property-info { flex: 1; min-width: 0; }
+  .showing-property-price { font-weight: 700; font-size: 16px; color: #111827; }
+  .showing-property-address { font-size: 11px; color: #374151; margin-top: 2px; line-height: 1.3; }
+  .showing-property-agent { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+
+  .showing-field-label {
+    font-size: 12px; font-weight: 600; color: #111827; margin-bottom: 6px;
+  }
+  .showing-date-wrapper {
+    position: relative; margin-bottom: 14px;
+  }
+  .showing-date-input {
+    width: 100%; border: 1px solid #D1D5DB; border-radius: 10px;
+    padding: 10px 38px 10px 12px; font-size: 13px; color: #374151;
+    font-family: inherit; outline: none; appearance: none; -webkit-appearance: none;
+    background: #fff;
+  }
+  .showing-date-input:focus { border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+  .showing-date-icon {
+    position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+    color: #9CA3AF; pointer-events: none; font-size: 15px;
+  }
+  .showing-time-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .showing-time-select {
+    flex: 1; border: 1px solid #D1D5DB; border-radius: 10px;
+    padding: 10px 12px; font-size: 13px; color: #374151;
+    font-family: inherit; outline: none; background: #fff;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    padding-right: 30px;
+  }
+  .showing-ampm-select {
+    width: 90px; flex-shrink: 0;
+    border: 1px solid #D1D5DB; border-radius: 10px;
+    padding: 10px 12px; font-size: 13px; color: #374151;
+    font-family: inherit; outline: none; background: #fff;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    padding-right: 28px;
+  }
+  .showing-time-select:focus, .showing-ampm-select:focus {
+    border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+  }
+  .showing-modal-actions {
+    display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+    margin-top: 4px;
+  }
+  .showing-cancel-btn {
+    background: none; border: none; font-size: 13px; font-weight: 500;
+    color: #374151; cursor: pointer; padding: 8px 12px;
+    border-radius: 8px; font-family: inherit;
+  }
+  .showing-cancel-btn:hover { background: #F3F4F6; }
+  .showing-generate-btn {
+    display: flex; align-items: center; gap: 7px;
+    background: #1F2937; color: #fff; border: none;
+    padding: 10px 16px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: inherit;
+  }
+  .showing-generate-btn:hover { background: #374151; }
+
+  /* Standalone PWA (installed on home screen): drop the desktop phone-frame chrome
+     so the prototype fills the actual device viewport instead of rendering as a
+     phone-inside-a-phone. Browser tab view is unaffected. */
+  @media (display-mode: standalone), (display-mode: fullscreen) {
+    html, body { background: #FFFFFF; }
+    .phone {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ====================== SCENE 1: Landing ====================== -->
+  <div class="screen active" id="s1">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs text-link font-medium" data-goto="5" onclick="setIntent(null)">Log In · Sign Up free</div>
+      </div>
+      <div class="phone-content" style="display:flex; flex-direction:column;">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="w-10 h-10 rounded-full bg-soft flex items-center justify-center text-muted">👤</div>
+          <div><div class="font-bold text-lg leading-tight">Hi, I'm Nestor</div></div>
+        </div>
+        <p class="text-sm leading-relaxed mb-4" style="color:#374151;">
+          I can help you browse homes, schedule showings directly with listing agents, provide data so you can make informed offers, and guide you from search to close.
+        </p>
+        <div class="text-center font-semibold text-sm mb-2" style="color:#1F2937;">
+          Search for free. Pay only if you want to buy.
+        </div>
+        <div class="space-y-2 text-xs">
+          <div class="bg-soft border border-line rounded-lg p-2 flex items-center gap-2"><span>🏠</span> Browse and save homes</div>
+          <div class="bg-soft border border-line rounded-lg p-2 flex items-center gap-2"><span>📅</span> Schedule showings with listing agents</div>
+          <div class="bg-soft border border-line rounded-lg p-2 flex items-center gap-2"><span>📈</span> Market data &amp; comps</div>
+        </div>
+        <div style="margin-top:auto;">
+          <div class="mt-4 text-center text-sm font-semibold">Explore your next home</div>
+          <div class="mt-2 flex gap-2 text-xs">
+            <label class="flex items-center gap-1" data-goto="2"><input type="radio" name="q1" checked> I'm looking</label>
+            <label class="flex items-center gap-1" data-goto="2"><input type="radio" name="q1"> I've found a house</label>
+          </div>
+          <div class="phone-input mt-3" style="margin: 8px 0 0 0;" data-goto="2">
+            <span class="flex-1 text-muted">Show me homes in Charleston…</span>
+            <span class="bg-ink text-white px-2 py-1 rounded text-xs font-medium">Ask Nestor</span>
+          </div>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 2: Profile flow ====================== -->
+  <div class="screen" id="s2">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="bubble-bot">What price range feels comfortable for you?</div>
+        <div class="mb-2">
+          <span class="chip" data-goto="3">Under $300K</span>
+          <span class="chip" data-goto="3">$300K–$500K</span>
+          <span class="chip chip-selected" data-goto="3">$500K–$750K</span>
+          <span class="chip" data-goto="3">$750K–$1M</span>
+        </div>
+        <div class="bubble-user">$500K–$750K</div>
+        <div class="bubble-bot">Got it. Which area are you focused on?</div>
+        <div class="mb-2">
+          <span class="chip" data-goto="3">Downtown</span>
+          <span class="chip chip-selected" data-goto="3">Mount Pleasant</span>
+          <span class="chip" data-goto="3">West Ashley</span>
+          <span class="chip" data-goto="3">James Island</span>
+        </div>
+        <button class="w-full border border-line rounded-lg py-2 text-xs font-medium mb-2 flex items-center justify-center gap-1" style="background:#fff; cursor:pointer; color:#1F2937;" data-goto="18">
+          <span>📍</span> Pick on map
+        </button>
+        <div class="bubble-user">Mount Pleasant</div>
+        <div class="bubble-bot">
+          Noted. What kind of property?
+          <div class="typing-dots mt-2"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="phone-input" data-goto="3">
+        <span class="flex-1">Type your answer…</span><span>🎙</span>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 3: Search results ====================== -->
+  <div class="screen" id="s3">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="flex items-start gap-2 mb-3">
+          <div class="w-8 h-8 rounded-full bg-soft flex items-center justify-center text-xs">👤</div>
+          <div class="flex-1 text-sm">
+            I found <strong>14 homes</strong> in Mount Pleasant under $700k.
+          </div>
+        </div>
+        <div class="flex gap-1 flex-wrap mb-2" style="font-size:10px;">
+          <span class="chip" style="padding: 4px 8px; font-size: 10px;">Home Type ⌄</span>
+          <span class="chip" style="padding: 4px 8px; font-size: 10px;">Price ⌄</span>
+          <span class="chip" style="padding: 4px 8px; font-size: 10px;">Beds &amp; Baths ⌄</span>
+        </div>
+        <div class="text-xs flex justify-between mb-3">
+          <a class="text-link underline">Reset filters</a>
+          <a class="text-link underline">Save Search</a>
+        </div>
+        <div class="text-muted mb-1" style="font-size:10px;">Tap a card to open →</div>
+        <div class="lc" data-goto="4">
+          <div class="flex justify-between mb-1 text-muted" style="font-size:10px;">Detached <span>♡</span></div>
+          <div class="lc-img">📷 1/20</div>
+          <div class="price">$649,000</div>
+          <div class="meta">410 Hibben St</div>
+          <div class="meta">3bd · 2ba · 1,840 sqft</div>
+        </div>
+        <div class="lc" data-goto="4">
+          <div class="flex justify-between mb-1 text-muted" style="font-size:10px;">Detached <span>♡</span></div>
+          <div class="lc-img">📷 1/18</div>
+          <div class="price">$695,000</div>
+          <div class="meta">22 Bowman Rd</div>
+          <div class="meta">3bd · 2.5ba · 2,100 sqft</div>
+        </div>
+      </div>
+      <div class="phone-input">
+        <span class="flex-1">What can I help you with next?</span><span>🎙</span>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 4: House details ====================== -->
+  <div class="screen" id="s4">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content" style="padding-top: 8px;">
+        <div class="text-xs text-link underline mb-2" data-goto="3">‹ Back to list</div>
+        <div class="flex justify-between items-start mb-2">
+          <div class="text-sm font-semibold">410 Hibben St, Mount Pleasant SC</div>
+          <div class="text-lg">♡</div>
+        </div>
+        <div class="lc-img" style="height: 110px; margin-bottom: 8px;">📷 1 / 20</div>
+        <div class="flex gap-1 mb-3">
+          <div style="height: 30px; width: 30px;" class="lc-img">📷</div>
+          <div style="height: 30px; width: 30px;" class="lc-img">📷</div>
+          <div style="height: 30px; width: 30px;" class="lc-img">📷</div>
+          <div style="height: 30px; width: 30px;" class="lc-img">📷</div>
+        </div>
+        <div class="text-muted" style="font-size:10px;">Listing price</div>
+        <div class="text-lg font-bold">$649,000</div>
+        <div class="text-muted" style="font-size:10px;">Last price change: 21 days ago · On market: 31 days</div>
+
+        <div class="mt-3 space-y-1">
+          <button class="action-btn" onclick="openShowingModal()">
+            <span>📅 Schedule Showing</span>
+            <span class="lock">🔒 Sign in · $49/mo</span>
+          </button>
+          <button class="action-btn" data-goto="5" onclick="setIntent('offer')">
+            <span>📝 Begin Offer</span>
+            <span class="lock">🔒 Sign in · $49/mo</span>
+          </button>
+        </div>
+
+        <div class="mt-3 space-y-1 text-xs">
+          <div class="border border-line rounded-lg p-2 flex justify-between">Key property details <span>+</span></div>
+          <div class="border border-line rounded-lg p-2 flex justify-between">Price history <span>+</span></div>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+
+      <!-- Schedule Showing modal (inside phone frame) -->
+      <div class="showing-modal-overlay" id="showingModal">
+        <div class="showing-modal">
+          <div class="showing-modal-header">
+            <div class="showing-modal-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              Schedule a Showing
+            </div>
+            <button class="showing-modal-close" onclick="closeShowingModal()">✕</button>
+          </div>
+
+          <div class="showing-property-card">
+            <div class="showing-property-thumb">🏡</div>
+            <div class="showing-property-info">
+              <div class="showing-property-price">$649,000</div>
+              <div class="showing-property-address">410 Hibben St, Mount Pleasant, SC 29464</div>
+              <div class="showing-property-agent">Alex Morgan</div>
+            </div>
+          </div>
+
+          <div class="showing-field-label">Preferred Date</div>
+          <div class="showing-date-wrapper">
+            <input class="showing-date-input" type="date" id="showingDate" placeholder="mm.dd.yyyy">
+            <span class="showing-date-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </span>
+          </div>
+
+          <div class="showing-field-label">Preferred Time</div>
+          <div class="showing-time-row">
+            <select class="showing-time-select" id="showingHour">
+              <option value="">Hour</option>
+              <option>8</option><option>9</option><option>10</option>
+              <option>11</option><option>12</option><option>1</option>
+              <option>2</option><option>3</option><option>4</option>
+              <option>5</option><option>6</option><option>7</option>
+            </select>
+            <select class="showing-ampm-select" id="showingAmPm">
+              <option>AM</option>
+              <option selected>PM</option>
+            </select>
+          </div>
+
+          <div class="showing-modal-actions">
+            <button class="showing-cancel-btn" onclick="closeShowingModal()">Cancel</button>
+            <button class="showing-generate-btn" onclick="generateShowingEmail()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              Generate Email
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 5: Auth + Brokerage Disclosure ====================== -->
+  <div class="screen" id="s5">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs text-muted">Step 1 of 2 · One-time</div>
+      </div>
+      <div class="phone-content">
+        <div class="text-sm font-bold mb-1">Before you continue</div>
+        <div class="text-muted text-xs mb-3">Review how Nestor works, then sign in to continue.</div>
+        <div class="disclosure">
+          <div class="disclosure-title">SC Disclosure of Brokerage Relationships</div>
+          <ul>
+            <li>NovaCasa Brokerage operates as a <strong>Transaction Broker</strong> in South Carolina.</li>
+            <li>Nestor is the AI technology platform operating under NovaCasa Brokerage.</li>
+            <li>Nestor does not provide legal advice.</li>
+            <li>Nestor does not advocate against the seller.</li>
+            <li>You may seek independent legal or agency representation.</li>
+            <li>You remain responsible for final contractual decisions.</li>
+          </ul>
+        </div>
+        <div class="disclosure">
+          <div class="disclosure-title">Transaction Brokerage Agreement</div>
+          <div>By continuing, you acknowledge that you have read and agree to the <a class="text-link underline">Transaction Brokerage Agreement</a> with NovaCasa Brokerage.</div>
+        </div>
+        <label class="flex items-start gap-2 text-xs mb-3" style="color:#374151;">
+          <input type="checkbox" checked style="margin-top:2px;">
+          <span>I have read and agree to the disclosures and the Transaction Brokerage Agreement.</span>
+        </label>
+        <div>
+          <button class="oauth-btn" data-goto="" onclick="gotoFromDisclosure()">
+            <span>🇬</span> Continue with Google
+          </button>
+          <button class="oauth-btn" data-goto="" onclick="gotoFromDisclosure()">
+            <span>🍎</span> Continue with Apple
+          </button>
+          <button class="oauth-btn" data-goto="" onclick="gotoFromDisclosure()">
+            <span>📘</span> Continue with Facebook
+          </button>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 20: Showing email draft ====================== -->
+  <div class="screen" id="s20">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="bubble-bot">Here's a draft email to the listing agent for your showing request.</div>
+        <div class="border border-line rounded-xl p-3 mb-2 bg-white">
+          <div class="text-muted" style="font-size:10px;">To: Alex Morgan · Charleston Realty</div>
+          <div class="text-muted" style="font-size:10px;" id="showingEmailSubject">Subject: Showing request — 410 Hibben St</div>
+          <div class="text-xs mt-2 leading-relaxed" style="color:#374151;">
+            Hi Alex,<br><br>
+            My client would like to schedule a showing for 410 Hibben St (MLS SC-310123) on <strong id="showingEmailDateText">the requested date</strong> at <strong id="showingEmailTimeText">the requested time</strong>. Please let us know if this works or suggest an alternate time.<br><br>
+            Thank you,<br>
+            Nestor (on behalf of buyer)<br><br>
+            <span style="color:#6B7280; font-size:10px; font-style:italic;">
+            — Nestor is the technology tool operating under NovaCasa Brokerage as a Transaction Broker as permitted in the state of South Carolina.
+            </span>
+          </div>
+          <div class="mt-3 flex gap-2" style="font-size:10px;">
+            <span class="px-2 py-1 bg-soft rounded" style="cursor:pointer;">Edit</span>
+            <span class="px-2 py-1 bg-ink text-white rounded font-medium" style="cursor:pointer;" data-goto="17">Send</span>
+          </div>
+        </div>
+      </div>
+      <div class="phone-input">
+        <span class="flex-1">Anything to add?</span><span>🎙</span>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 7: Subscription ====================== -->
+  <div class="screen" id="s7">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="text-center mb-3">
+          <div class="text-2xl font-bold">$49<span class="text-sm font-medium text-muted">/mo</span></div>
+          <div class="text-xs text-muted">2-week free trial · capped at $599 per transaction / 12-month cycle</div>
+        </div>
+        <div class="text-xs font-semibold mb-2">With subscription:</div>
+        <ul class="text-xs space-y-2 mb-3" style="list-style:none; padding:0; margin:0;">
+          <li class="flex items-start gap-2"><span class="text-ok">✓</span> Schedule showings</li>
+          <li class="flex items-start gap-2"><span class="text-ok">✓</span> Prepare offer terms</li>
+          <li class="flex items-start gap-2"><span class="text-ok">✓</span> CMA reports (PDF)</li>
+          <li class="flex items-start gap-2"><span class="text-ok">✓</span> Document verification (AI)</li>
+          <li class="flex items-start gap-2"><span class="text-ok">✓</span> Under-contract dashboard with deadlines</li>
+        </ul>
+        <div class="disclosure mb-3" style="background:#FEF3C7; border-color:#FDE68A;">
+          <strong>$599 cap</strong> — total technology facilitation fee. The remaining balance is charged directly to your card on file <strong>when the property goes under contract</strong> (not through escrow).
+        </div>
+        <button class="w-full bg-ink text-white rounded-lg py-3 text-sm font-medium mb-2" style="border:0; cursor:pointer;" data-goto="" onclick="gotoFromPaywall()">Start free trial</button>
+        <button class="w-full text-white rounded-lg py-3 text-sm font-medium" style="background:#000; border:0; cursor:pointer;" data-goto="" onclick="gotoFromPaywall()">Pay</button>
+        <div class="mt-2 text-center text-muted" style="font-size:10px;">
+          <a class="text-link underline" data-goto="16">See full pricing details</a>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 8: Pre-approval upload ====================== -->
+  <div class="screen" id="s8">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="text-sm font-semibold mb-1">Prepare an offer</div>
+        <div class="text-xs text-muted mb-3">Upload your pre-approval letter so Nestor can include it in the offer bundle.</div>
+        <div class="flex gap-1 mb-3 flex-wrap" style="font-size:10px;">
+          <span class="chip" style="padding: 4px 8px;">Quick CMA</span>
+          <span class="chip" style="padding: 4px 8px;">Offer Info Sheet</span>
+          <span class="chip chip-selected" style="padding: 4px 8px;">Pre-approval</span>
+          <span class="chip" style="padding: 4px 8px;">Proof of funds</span>
+        </div>
+        <div class="border-2 border-dashed border-line rounded-lg p-4 text-center mb-3">
+          <div style="font-size:22px;" class="mb-1">📷</div>
+          <div class="text-xs font-medium">Take photo or upload</div>
+          <div class="text-muted mt-1" style="font-size:10px;">PDF, JPG, PNG · up to 10MB</div>
+        </div>
+        <div class="bg-soft rounded-lg p-3 mb-2">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="text-xs font-medium flex-1">PreApproval_Sarah.pdf</div>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="h-1 rounded overflow-hidden" style="background:#E5E7EB;">
+            <div class="h-full" style="background:#10B981; width: 70%; animation: progress 2s ease-in-out infinite;"></div>
+          </div>
+          <div class="text-muted mt-1" style="font-size:10px;">Verifying with AI…</div>
+        </div>
+        <div class="border rounded-lg p-3 text-xs" style="background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.3);" data-goto="9">
+          <div class="font-medium text-ok mb-1">✓ Verified — tap to continue</div>
+          <div style="color:#374151;">Lender: <strong>Palmetto Bank</strong> · Buyer: Sarah J. · Max loan: <strong>$700,000</strong> · Expires: Dec 31, 2026</div>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 9: Offer terms ====================== -->
+  <div class="screen" id="s9">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content" style="padding-top: 8px;">
+        <div class="text-sm font-semibold">Prepare your offer</div>
+        <div class="text-muted mb-2" style="font-size:10px;">Enter your offer terms below. Nestor will format and send them to the listing agent to prepare the official contract.</div>
+        <div class="flex gap-1 flex-wrap mb-2" style="font-size:10px;">
+          <span class="chip chip-selected" style="padding: 4px 8px;">Offer terms</span>
+          <span class="chip" style="padding: 4px 8px;">Pre-approval</span>
+          <span class="chip" style="padding: 4px 8px;">Proof of funds</span>
+        </div>
+        <div class="border border-line rounded p-2 mb-2 text-xs">
+          <div class="text-muted">Property</div>
+          <div class="font-medium">410 Hibben St, Mount Pleasant SC</div>
+          <div class="text-muted" style="font-size:10px;">$649,000 · MLS SC-310123</div>
+        </div>
+        <div class="space-y-2 text-xs">
+          <div><div class="text-muted" style="font-size:10px;">Purchase price</div><div class="border-b py-1">$640,000</div></div>
+          <div><div class="text-muted" style="font-size:10px;">Earnest money</div><div class="border-b py-1">$5,000 · check · seller's attorney</div></div>
+          <div><div class="text-muted" style="font-size:10px;">Financing</div><div class="border-b py-1">Conventional · 80% LTV · Palmetto Bank</div></div>
+          <div><div class="text-muted" style="font-size:10px;">Closing date</div><div class="border-b py-1">Oct 31, 2026</div></div>
+          <div><div class="text-muted" style="font-size:10px;">Seller concession</div><div class="border-b py-1">$5,000 · general closing costs</div></div>
+        </div>
+        <button class="w-full bg-ink text-white rounded-lg py-2 text-xs font-medium mt-3" style="border:0; cursor:pointer;" data-goto="10">Continue</button>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 10: Buyer Acknowledgment ====================== -->
+  <div class="screen" id="s10">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="text-sm font-bold mb-1">Before you submit your offer</div>
+        <div class="text-muted text-xs mb-3">Please acknowledge the following:</div>
+        <div class="disclosure">
+          <ul style="list-style: '✓ '; padding-left: 18px;">
+            <li>Nestor is a technology-assisted transaction workflow.</li>
+            <li>NovaCasa Brokerage acts as a Transaction Broker; no fiduciary advocacy.</li>
+            <li>You may seek attorney review at any time.</li>
+            <li>The seller may decline to cover the $599 facilitation fee.</li>
+            <li><strong>You remain responsible for the $599 fee regardless of seller participation.</strong></li>
+          </ul>
+        </div>
+        <label class="flex items-start gap-2 text-xs mb-3" style="color:#374151;">
+          <input type="checkbox" checked style="margin-top:2px;">
+          <span>I have read and acknowledge the above.</span>
+        </label>
+        <button class="w-full bg-ink text-white rounded-lg py-3 text-sm font-medium" style="border:0; cursor:pointer;" data-goto="11">
+          I understand and agree — continue
+        </button>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 11: Bundle & Send ====================== -->
+  <div class="screen" id="s11">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="text-sm font-semibold mb-1">Bundle and send</div>
+        <div class="text-muted mb-3" style="font-size:10px;">All offer terms and supporting documents to the listing agent.</div>
+        <div class="space-y-1 text-xs mb-3">
+          <div class="flex justify-between p-2 border border-line rounded"><span>Quick CMA (PDF)</span><span class="text-ok">✓</span></div>
+          <div class="flex justify-between p-2 border border-line rounded"><span>Offer terms summary</span><span class="text-ok">✓</span></div>
+          <div class="flex justify-between p-2 border border-line rounded"><span>Pre-approval letter</span><span class="text-ok">✓</span></div>
+          <div class="flex justify-between p-2 border border-line rounded"><span>Proof of funds</span><span class="text-ok">✓</span></div>
+          <div class="flex justify-between p-2 border border-line rounded"><span>Seller concession: $5,000</span><span class="text-ok">✓</span></div>
+        </div>
+        <div class="text-muted" style="font-size:10px;">To (listing agent)</div>
+        <div class="border-b py-1 mb-2 text-xs">alex.morgan@charlestonrealty.com</div>
+        <div class="text-muted" style="font-size:10px;">Subject</div>
+        <div class="border-b py-1 mb-2 text-xs">Offer for 410 Hibben St — Sarah J.</div>
+        <div class="flex gap-2 mt-3">
+          <button class="flex-1 rounded py-2 text-xs bg-ink text-white font-medium" style="border:0; cursor:pointer;" data-goto="12">Email bundle</button>
+          <button class="flex-1 border border-line rounded py-2 text-xs" style="background:#fff; cursor:pointer;">Download bundle</button>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 12: Counter-offer ====================== -->
+  <div class="screen" id="s12">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="bubble-bot">The listing agent counter-offered. Here's what changed:</div>
+        <div class="border border-line rounded-lg p-3 mb-2 text-xs bg-white">
+          <div class="flex justify-between mb-2 py-2 border-b"><span class="font-medium">Purchase price</span><span><span class="line-through text-muted">$640,000</span> → <strong class="text-bad">$655,000</strong></span></div>
+          <div class="flex justify-between mb-2 py-2 border-b"><span class="font-medium">Closing date</span><span><span class="line-through text-muted">Oct 31</span> → <strong class="text-bad">Nov 14</strong></span></div>
+          <div class="flex justify-between mb-2 py-2 border-b"><span class="font-medium">Earnest money</span><span class="text-muted">$5,000 · unchanged</span></div>
+          <div class="flex justify-between mb-2 py-2 border-b"><span class="font-medium">Seller closing-cost concession</span><span class="text-muted">$5,000 · <strong class="text-ok">accepted</strong></span></div>
+        </div>
+        <div class="bubble-bot">Two changes: price up $15k, closing pushed 14 days. Seller accepted the $5,000 closing-cost concession. Want to accept, counter back, or walk away?</div>
+        <div class="flex gap-2 mt-2">
+          <button class="flex-1 bg-ink text-white rounded-lg py-2 text-xs font-medium" style="border:0; cursor:pointer;" data-goto="14">Accept</button>
+          <button class="flex-1 border border-line rounded-lg py-2 text-xs" style="background:#fff; cursor:pointer;">Counter</button>
+          <button class="flex-1 border border-line rounded-lg py-2 text-xs" style="background:#fff; cursor:pointer;">Walk away</button>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 13: Under-contract dashboard ====================== -->
+  <div class="screen" id="s13">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="text-sm font-semibold mb-1">Under Contract</div>
+        <div class="flex justify-between mb-3 text-xs">
+          <span class="text-muted">📍 410 Hibben St</span>
+          <span>Closing in: <strong>23 days</strong></span>
+        </div>
+        <div class="text-xs font-semibold mb-2">📅 Key dates</div>
+        <div class="border border-line rounded-lg p-3 text-xs mb-3 space-y-2">
+          <div class="flex justify-between"><span class="text-muted">Inspection / Due diligence</span><strong>Oct 10</strong></div>
+          <div class="flex justify-between"><span class="text-muted">Appraisal / Financing</span><strong>Oct 17</strong></div>
+          <div class="flex justify-between"><span class="text-muted">Closing date</span><strong>Oct 31</strong></div>
+        </div>
+        <div class="text-xs font-semibold mb-2">📇 Contacts</div>
+        <div class="border border-line rounded-lg p-3 text-xs mb-3 space-y-2">
+          <div><div class="font-medium">Listing Agent</div><div class="text-muted" style="font-size:10px;">Alex Morgan · Charleston Realty</div></div>
+          <div><div class="font-medium">Closing Attorney</div><div class="text-muted" style="font-size:10px;">Harbor Title Co.</div></div>
+          <div><div class="font-medium">Lender</div><div class="text-muted" style="font-size:10px;">Palmetto Bank Mortgage</div></div>
+        </div>
+        <button class="w-full bg-ink text-white rounded-lg py-2 text-xs font-medium" style="border:0; cursor:pointer;" data-goto="19">Continue to Documents</button>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 14: Under contract · $599 top-up ====================== -->
+  <div class="screen" id="s14">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="text-center mb-3">
+          <div style="font-size:32px;">🎉</div>
+          <div class="text-sm font-bold">Property under contract</div>
+          <div class="text-muted text-xs mt-1">Listing agent will prepare the official Purchase Agreement in Dotloop/DocuSign.</div>
+        </div>
+        <div class="border border-line rounded-lg p-3 mb-3 text-xs">
+          <div class="font-semibold mb-2">Payment summary · $599 cap</div>
+          <div class="flex justify-between py-1"><span class="text-muted">Total facilitation fee</span><strong>$599</strong></div>
+          <div class="flex justify-between py-1"><span class="text-muted">Paid so far (2 × $49)</span><strong>$98</strong></div>
+          <div class="flex justify-between py-2"><span class="font-semibold">Charged just now</span><strong style="font-size:14px;">$501</strong></div>
+          <div class="text-muted mt-1" style="font-size:10px;">To Visa •••• 4242 · receipt sent to your email</div>
+        </div>
+        <div class="disclosure" style="background:#ECFDF5; border-color:#A7F3D0;">
+          <div style="color:#065F46;">
+            <strong>Direct card charge.</strong> The $599 facilitation fee was charged to your card on file — <strong>not</strong> through escrow.
+          </div>
+        </div>
+        <button class="w-full bg-ink text-white rounded-lg py-3 text-sm font-medium mt-3" style="border:0; cursor:pointer;" data-goto="13">Continue to Under-Contract Dashboard</button>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 17: Showing scheduled ====================== -->
+  <div class="screen" id="s17">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="text-center mb-3">
+          <div style="font-size:32px;">📅</div>
+          <div class="text-sm font-bold">Showing scheduled</div>
+          <div class="text-muted text-xs mt-1">Your trial just started. $49/mo after 14 days.</div>
+        </div>
+        <div class="border border-line rounded-lg p-3 mb-3 text-xs">
+          <div class="font-semibold mb-2">Visit details</div>
+          <div class="flex justify-between py-1"><span class="text-muted">Property</span><strong>410 Hibben St</strong></div>
+          <div class="flex justify-between py-1"><span class="text-muted">Date / time</span><strong id="showingConfirmDateTime">Sat · May 24 · 11:00 AM</strong></div>
+          <div class="flex justify-between py-1"><span class="text-muted">Listing agent</span><strong>Alex Morgan</strong></div>
+        </div>
+        <div class="disclosure" style="background:#EFF6FF; border-color:#BFDBFE;">
+          <div style="color:#1E3A8A;">
+            You agreed to the Brokerage Disclosure and Transaction Brokerage Agreement on <strong>2026-05-18</strong>. <a class="text-link underline">Review</a>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button class="flex-1 bg-ink text-white rounded-lg py-2 text-xs font-medium" style="border:0; cursor:pointer;" data-goto="3">Back to search</button>
+          <button class="flex-1 border border-line rounded-lg py-2 text-xs" style="background:#fff; cursor:pointer;" data-goto="4">View listing</button>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 18: Pick on map ====================== -->
+  <div class="screen" id="s18">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs text-link underline" onclick="back()" style="cursor:pointer;">‹ Back</div>
+      </div>
+      <div class="phone-content" style="padding:0; display:flex; flex-direction:column;">
+        <div style="padding: 10px 14px; border-bottom: 1px solid #F3F4F6;">
+          <div class="text-xs font-semibold">Pick area on map</div>
+          <div class="text-muted" style="font-size:10px;">Drag to move pin · use +/− to adjust radius</div>
+        </div>
+        <div style="position:relative; flex:1; background:#E8EEF3; overflow:hidden;">
+          <svg width="100%" height="100%" viewBox="0 0 360 460" preserveAspectRatio="xMidYMid slice" style="display:block;">
+            <path d="M -10 380 Q 60 360 130 380 T 260 370 T 380 380 L 380 480 L -10 480 Z" fill="#BFDBEA"/>
+            <rect x="40" y="120" width="90" height="60" rx="8" fill="#C9E2C1" opacity="0.8"/>
+            <rect x="240" y="200" width="100" height="80" rx="8" fill="#C9E2C1" opacity="0.8"/>
+            <g stroke="#FFFFFF" stroke-width="6" stroke-linecap="round">
+              <line x1="-10" y1="80" x2="370" y2="80"/><line x1="-10" y1="160" x2="370" y2="160"/>
+              <line x1="-10" y1="240" x2="370" y2="240"/><line x1="-10" y1="320" x2="370" y2="320"/>
+              <line x1="60" y1="-10" x2="60" y2="470"/><line x1="160" y1="-10" x2="160" y2="470"/>
+              <line x1="240" y1="-10" x2="240" y2="470"/><line x1="320" y1="-10" x2="320" y2="470"/>
+            </g>
+            <circle id="mapRadius" cx="180" cy="230" r="80" fill="#2563EB" fill-opacity="0.15" stroke="#2563EB" stroke-width="2" stroke-dasharray="6 4"/>
+            <g transform="translate(180,230)"><circle r="8" fill="#1F2937"/><circle r="3" fill="#fff"/></g>
+          </svg>
+          <div style="position:absolute; top:12px; right:12px; display:flex; flex-direction:column; gap:6px;">
+            <button onclick="changeMapRadius(20)" style="width:36px; height:36px; border:1px solid #D1D5DB; background:#fff; border-radius:8px; font-size:18px; font-weight:600; cursor:pointer;">+</button>
+            <button onclick="changeMapRadius(-20)" style="width:36px; height:36px; border:1px solid #D1D5DB; background:#fff; border-radius:8px; font-size:18px; font-weight:600; cursor:pointer;">−</button>
+          </div>
+          <div style="position:absolute; left:12px; bottom:12px; background:#fff; border:1px solid #E5E7EB; border-radius:8px; padding:6px 10px; font-size:11px;">
+            Radius: <strong id="mapRadiusLabel">2.0 mi</strong>
+          </div>
+        </div>
+        <div style="padding:10px 14px; border-top:1px solid #F3F4F6; display:flex; gap:8px;">
+          <button class="flex-1 border border-line rounded-lg py-2 text-xs" style="background:#fff; cursor:pointer;" onclick="back()">Cancel</button>
+          <button class="flex-1 bg-ink text-white rounded-lg py-2 text-xs font-medium" style="border:0; cursor:pointer;" data-goto="3">Confirm area</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 19: Documents Timeline ====================== -->
+  <div class="screen" id="s19">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="text-sm font-semibold mb-1">Documents</div>
+        <div class="text-muted mb-3" style="font-size:10px;">All transaction documents and their status.</div>
+        <div class="text-xs font-semibold mb-1" style="color:#1D4ED8;">✅ Signed in Nestor (onboarding)</div>
+        <div class="border border-line rounded-lg p-2 mb-3" style="font-size:11px;">
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Brokerage Relationships Disclosure</span><span class="text-ok" style="font-size:10px;">Signed · May 18</span></div>
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Transaction Brokerage Agreement / ToU</span><span class="text-ok" style="font-size:10px;">Signed · May 18</span></div>
+          <div class="flex justify-between py-1"><span>Buyer ack: no buyer-agency comp</span><span class="text-ok" style="font-size:10px;">Signed · May 18</span></div>
+        </div>
+        <div class="text-xs font-semibold mb-1" style="color:#15803D;">📤 Submitted from you</div>
+        <div class="border border-line rounded-lg p-2 mb-3" style="font-size:11px;">
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Proof of Funds / Pre-approval</span><span class="text-ok" style="font-size:10px;">Verified · May 19</span></div>
+          <div class="flex justify-between py-1"><span>Offer summary (SCR310 intent)</span><span class="text-ok" style="font-size:10px;">Sent · May 19</span></div>
+        </div>
+        <div class="text-xs font-semibold mb-1" style="color:#7C2D12;">✍️ Awaiting signature (Dotloop/DocuSign)</div>
+        <div class="border border-line rounded-lg p-2 mb-3" style="font-size:11px;">
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Residential Purchase Agreement</span><span style="color:#B45309; font-size:10px;">Listing agent preparing</span></div>
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Lead-Based Paint Disclosure</span><span class="text-muted" style="font-size:10px;">Pending</span></div>
+          <div class="flex justify-between py-1"><span>Property Disclosure forms</span><span class="text-muted" style="font-size:10px;">Pending</span></div>
+        </div>
+        <div class="flex gap-2">
+          <button class="flex-1 border border-line rounded-lg py-2 text-xs" style="background:#fff; cursor:pointer;">Upload signed docs</button>
+          <button class="flex-1 bg-ink text-white rounded-lg py-2 text-xs font-medium" style="border:0; cursor:pointer;" data-goto="15">Continue</button>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 15: Buyer Hub ====================== -->
+  <div class="screen" id="s15">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="text-xs text-link" onclick="back()" style="cursor:pointer;">‹ Back</div>
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs">🔔 <span class="text-link" data-goto="16">Menu</span></div>
+      </div>
+      <div class="phone-content">
+        <div class="text-sm font-semibold mb-1">Homeowner Hub</div>
+        <div class="text-muted mb-3" style="font-size:10px;">Everything in one place</div>
+        <div class="text-xs mb-3">📍 410 Hibben St, Mount Pleasant 29464</div>
+        <div class="space-y-2 text-xs">
+          <div class="border border-line rounded-lg p-3 flex justify-between"><span>🔌 Utilities setup</span><span>+</span></div>
+          <div class="border border-line rounded-lg p-3 flex justify-between"><span>🔧 Local pros</span><span>+</span></div>
+          <div class="border border-line rounded-lg p-3 flex justify-between"><span>🏛 Official links &amp; records</span><span>+</span></div>
+          <div class="border border-line rounded-lg p-3 flex justify-between"><span>🔗 My links</span><span>+</span></div>
+        </div>
+        <div class="mt-4 p-3 rounded-lg text-center" style="background:#10B981; color:#fff;">
+          <div class="font-semibold text-sm">🎉 End of walkthrough</div>
+          <div class="mt-1" style="font-size:11px; opacity:0.9;">Tap Restart to start over.</div>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+  <!-- ====================== SCENE 16: Pricing ====================== -->
+  <div class="screen" id="s16">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="phone-brand"><div class="phone-logo"></div>NestorAI</div>
+        <div class="text-xs text-link underline" onclick="back()" style="cursor:pointer;">‹ Back</div>
+      </div>
+      <div class="phone-content">
+        <div class="text-sm font-bold mb-1">Pricing</div>
+        <div class="text-muted text-xs mb-3">Search for free. Pay only if you want to buy.</div>
+        <div class="tier">
+          <div class="tier-name">Free</div>
+          <div class="tier-price">$0 · no account required for browsing</div>
+          <ul><li>Property search</li><li>Save favorites</li><li>Compare homes</li></ul>
+        </div>
+        <div class="tier" style="border-color:#1F2937;">
+          <div class="tier-name">Signed-in (free account)</div>
+          <div class="tier-price">After the Onboarding Checkpoint: Brokerage Disclosure + Transaction Brokerage Agreement.</div>
+          <ul><li>Contact listing agents</li><li>Save searches across devices</li></ul>
+        </div>
+        <div class="tier" style="border-color:#1F2937;">
+          <div class="tier-name">Subscription · $49/month</div>
+          <div class="tier-price">2-week free trial · triggered when you schedule a showing or begin an offer.</div>
+          <ul><li>Schedule showings</li><li>Prepare offer terms</li><li>CMA reports (PDF)</li><li>Document verification (AI)</li><li>Under-contract dashboard</li></ul>
+        </div>
+        <div class="tier" style="background:#FEF3C7; border-color:#FDE68A;">
+          <div class="tier-name">$599 cap · Technology facilitation fee</div>
+          <div class="tier-price">Total capped at $599 per transaction or per 12-month cycle. Charged to your card on file when the property goes <strong>under contract</strong>.</div>
+        </div>
+      </div>
+      <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
+    </div>
+  </div>
+
+<script>
+  let current = 1;
+  let history = [1];
+  let intent = null;
+
+  function setIntent(i) { intent = i; }
+
+  function gotoFromDisclosure() {
+    if (intent === 'offer') return goTo(7);
+    return goTo(3);
+  }
+
+  function gotoFromPaywall() {
+    return goTo(8);
+  }
+
+  function openShowingModal() {
+    document.getElementById('showingModal').classList.add('open');
+  }
+
+  function closeShowingModal() {
+    document.getElementById('showingModal').classList.remove('open');
+  }
+
+  function generateShowingEmail() {
+    const dateInput = document.getElementById('showingDate').value;
+    const hour = document.getElementById('showingHour').value;
+    const ampm = document.getElementById('showingAmPm').value;
+
+    let dateText = 'the requested date';
+    let timeText = 'the requested time';
+
+    if (dateInput) {
+      const d = new Date(dateInput + 'T12:00:00');
+      dateText = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    if (hour) {
+      timeText = hour + ':00 ' + ampm;
+    }
+
+    const emailDateEl = document.getElementById('showingEmailDateText');
+    const emailTimeEl = document.getElementById('showingEmailTimeText');
+    const confirmEl = document.getElementById('showingConfirmDateTime');
+
+    if (emailDateEl) emailDateEl.textContent = dateText;
+    if (emailTimeEl) emailTimeEl.textContent = timeText;
+    if (confirmEl && dateInput && hour) {
+      confirmEl.textContent = dateText + ' · ' + timeText;
+    }
+
+    closeShowingModal();
+    goTo(20);
+  }
+
+  function changeMapRadius(delta) {
+    const circle = document.getElementById('mapRadius');
+    const label = document.getElementById('mapRadiusLabel');
+    if (!circle || !label) return;
+    let r = parseFloat(circle.getAttribute('r')) + delta;
+    r = Math.max(30, Math.min(160, r));
+    circle.setAttribute('r', r);
+    label.textContent = (r / 40).toFixed(1) + ' mi';
+  }
+
+  function goTo(n) {
+    if (n === current) return;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('s' + n);
+    if (!target) return;
+    target.classList.add('active');
+    history.push(n);
+    current = n;
+  }
+
+  function back() {
+    if (history.length <= 1) return;
+    history.pop();
+    current = history[history.length - 1];
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('s' + current).classList.add('active');
+  }
+
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('[data-goto]');
+    if (target) {
+      const n = parseInt(target.getAttribute('data-goto'), 10);
+      if (n) goTo(n);
+    }
+  });
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {
+        /* silent: file:// or unsupported context — POC continues without offline */
+      });
+    });
+  }
+</script>
+
+</body>
+</html>

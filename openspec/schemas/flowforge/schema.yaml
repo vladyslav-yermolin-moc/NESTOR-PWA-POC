@@ -1,0 +1,110 @@
+name: flowforge
+version: 2
+description: >
+  Extended OpenSpec workflow with ADR support, human approval gates,
+  implementation plans, and multi-agent execution.
+  Flow: proposal → design → specs → plan → tasks,
+  with conditional ADRs as a side-branch.
+
+artifacts:
+  - id: proposal
+    generates: proposal.md
+    description: Intent, scope, and context for the change
+    template: proposal.md
+    instruction: |
+      Before generating, read all existing ADRs from docs/decisions/ and
+      the current change's adrs/ folder. Cite any relevant ADRs.
+      Create a proposal that explains WHY this change is needed.
+      Cover motivation, what changes, scope boundaries, and impact.
+    requires: []
+
+  - id: design
+    generates: design.md
+    description: Technical approach and architecture decisions
+    template: design.md
+    instruction: |
+      Before generating, read all existing ADRs from docs/decisions/ and
+      the current change's adrs/ folder.
+      Create a technical design based on the proposal.
+      Must cite relevant ADRs as constraints on the technical approach.
+      Include architecture decisions with rationale — these will be
+      analyzed for potential ADR formalization.
+    requires:
+      - proposal
+
+  - id: specs
+    generates: specs/**/*.md
+    description: Delta specs for behavioral contracts
+    template: spec.md
+    instruction: |
+      Before generating, read all existing ADRs from docs/decisions/ and
+      the current change's adrs/ folder.
+      Create delta specs based on the design.
+      Must align scenarios with existing ADR decisions.
+      Use ADDED/MODIFIED/REMOVED sections with Given/When/Then scenarios.
+      Organize by domain under specs/ (e.g., specs/auth/spec.md).
+      Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY).
+    requires:
+      - design
+
+  - id: adrs
+    generates: adrs/*.md
+    description: Architectural Decision Records (conditional)
+    template: adr.md
+    instruction: |
+      Analyze the design and specs artifacts for substantive architectural
+      decisions. Create an ADR only when one or more of these conditions hold:
+      - A technology, framework, or library choice was made between alternatives
+      - A structural pattern was chosen (e.g., event-driven vs polling)
+      - A trade-off was explicitly evaluated (performance vs simplicity, etc.)
+      - An API contract or data model was established that constrains future work
+
+      If no substantive architectural decisions were made, create a single
+      file adrs/none.md containing: "No architectural decisions required
+      for this change."
+
+      Name each ADR file as YYYY-MM-DD-<short-title>.md using today's date.
+    requires:
+      - specs
+
+  - id: plan
+    generates: plan.md
+    description: Implementation blueprint with phases, agent routing, and parallelization
+    template: plan.md
+    instruction: |
+      Before generating, read all existing ADRs from docs/decisions/ and
+      the current change's adrs/ folder.
+      Create an implementation plan based on the specs.
+      Must incorporate ADR constraints into phase design and acceptance criteria.
+      Break the work into ordered phases with dependencies.
+      For each phase, specify what to change, acceptance criteria,
+      whether it can run in parallel with other phases, and agent routing
+      (which agent names from .claude/agents/ handle which tasks).
+      Mark PAR or SEQ per task. Mark human review checkpoints between phases.
+    requires:
+      - specs
+
+  - id: tasks
+    generates: tasks.md
+    description: Brief actionable checklist derived from the plan
+    template: tasks.md
+    instruction: |
+      Create a concise task checklist from the plan.
+      Group tasks by plan phase. Use checkbox format with
+      hierarchical numbering (1.1, 1.2). One line per task.
+      Example: - [ ] 1.1 Create authentication middleware
+    requires:
+      - plan
+
+gates:
+  default_behavior: stop_and_ask
+  checkpoints:
+    - after: proposal
+    - after: design
+    - after: specs
+    - after: plan
+    - after: tasks
+
+apply:
+  requires: [tasks]
+  tracks: tasks.md

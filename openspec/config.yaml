@@ -1,0 +1,102 @@
+schema: flowforge
+
+# External documentation directories to reference during the SDLC cycle.
+# Paths are relative to the project root. Contents are read as additional
+# context when creating proposals, designs, specs, plans, and ADRs.
+external_docs:
+  - docs/
+
+# Project context — describe your tech stack, conventions, and constraints.
+# Agents read this before generating any artifact.
+context: |
+  # Project: Nestor PWA POC
+  A small proof-of-concept that wraps the existing clickable HTML prototype
+  (`2026-05-19-mvp-showing.html`, ~1200 LOC, mobile-first phone-frame UI)
+  in a PWA shell so the client (Nora) can install it on her iPhone and feel
+  the technology firsthand before committing to PWA as the delivery vehicle
+  for the full Nestor product.
+
+  ## Tech Stack
+  Vanilla HTML + CSS + JavaScript. No framework. No build step. No bundler.
+  PWA layer added via `manifest.webmanifest` and `service-worker.js`
+  (Cache-First strategy for the app shell). Third-party assets loaded via
+  CDN `<link>` / `<script>` tags only — no npm.
+
+  ## Architecture
+  Static single-page site. One `index.html` (forked from the prototype),
+  plus `manifest.webmanifest`, `service-worker.js`, and an `icons/` directory.
+  All screen navigation is client-side via JS show/hide on a single document.
+  Service-worker scope is the site root.
+
+  ## Data Layer
+  None. All listing fixtures are inline in the HTML/JS. No database, no fetch,
+  no IndexedDB. `localStorage` MAY be used for transient UI state only.
+
+  ## API & Auth
+  None. No backend, no API client, no authentication. The only outbound calls
+  are to CDN-hosted static assets (fonts, icons).
+
+  ## Deployment
+  GitHub Pages. Static files committed to a repo; Pages serves them over HTTPS
+  at a `*.github.io` URL shared with Nora. HTTPS is required for service worker
+  registration on real devices. No CI build step.
+
+  ## Testing
+  Manual smoke testing on real iPhone (Safari 17+) and real Android (Chrome 120+).
+  Test pass criteria: PWA installs from "Add to Home Screen", branded splash
+  appears on launch, all screens render and navigation works offline after first
+  load. No automated test frameworks for the POC.
+
+  ## Conventions
+  - Files are served as-authored — no transpilation, no minification.
+  - All paths in `manifest.webmanifest` and `service-worker.js` MUST be relative
+    or scoped to the repo subpath (GitHub Pages serves under `/<repo>/`).
+  - JavaScript targets evergreen mobile browsers (iOS Safari 17+, Chrome 120+).
+    No transpilation, but no IE / legacy fallbacks.
+  - File naming: kebab-case for HTML/CSS/JS files (`index.html`, `service-worker.js`).
+  - The prototype HTML must remain functional when opened directly without the
+    service worker registered — PWA features are additive, not load-bearing.
+
+# Rules per artifact type — enforce quality standards for your project.
+# IMPORTANT: These rules are the mandatory FlowForge baseline.
+# You may replace any rule with a more specific version for your stack,
+# but never simply delete a rule — each one enforces a workflow requirement.
+rules:
+  proposal:
+    - Include explicit "out of scope" section
+    - Reference project brief for alignment
+    - Identify every affected file in the static site (HTML, CSS, JS, manifest, service-worker)
+    - Note any new third-party CDN dependency explicitly
+
+  design:
+    - List every new and modified file
+    - Document how the service worker cache strategy is affected (if at all)
+    - Sequence diagram required for any flow that touches PWA install / service worker registration
+    - Reference foundational ADRs by number (ADR-001..006)
+
+  specs:
+    - Use Given/When/Then format for all scenarios
+    - RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Include edge cases and error paths as separate scenarios (offline, no service worker support, etc.)
+    - Each requirement gets at least two scenarios (happy path + failure)
+
+  adrs:
+    - Only create for substantive decisions (not for cosmetic CSS or copy tweaks)
+    - Use MADR format with Constraints on Future Work
+    - Include Alternatives Considered
+    - One decision per ADR — split compound decisions
+    - Status: Proposed → Accepted on archive
+
+  plan:
+    - Every phase must have an independently testable goal
+    - Every task must be tagged SEQ or PAR
+    - Agent routing section is required — feeds /opsx:implement parallelism
+    - Smoke-test step on real iPhone + Android required before any URL is shared with Nora
+    - Always provide code samples to show how to implement the task
+    - No DB migration phase applies — call out N/A explicitly
+
+  tasks:
+    - Derived from plan.md — do not add tasks not in the plan
+    - Group by phase, then by layer within each phase (markup / styles / scripts / pwa / docs)
+    - Each task references both its plan entry number and its spec scenario
+    - Hierarchical numbering (1.1, 1.2)
