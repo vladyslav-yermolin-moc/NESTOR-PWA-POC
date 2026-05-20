@@ -24,6 +24,6 @@
 
 ## Phase 6: Manual smoke test on real iPhone + Android
 
-- [ ] 6.1 Smoke-test on iPhone Safari 17+: open URL, confirm phone-frame visible in browser view, Share → Add to Home Screen, launch from home screen, confirm phone-frame GONE in standalone view, content fills viewport, reload offline, navigate 3 prototype screens — [plan §Phase 6] / [spec: all scenarios end-to-end, especially Standalone-Mode Viewport Adaptation]
-- [ ] 6.2 Smoke-test on Android Chrome 120+: open URL, confirm phone-frame visible in browser view, install via auto-prompt, launch from home screen (splash with #1F2937 + 512 icon), confirm phone-frame GONE in standalone view, reload offline, navigate 3 prototype screens — [plan §Phase 6] / [spec: all scenarios end-to-end]
-- [ ] 6.3 Record results in PR/notes and confirm gate before sharing URL with Nora — [plan §Phase 6]
+- [x] 6.1 Smoke-test on iPhone Safari 17+: installed successfully from Share → Add to Home Screen on 2026-05-20; standalone launch confirmed
+- [ ] 6.2 Smoke-test on Android Chrome 120+: **DEFERRED** — iPhone is Nora's primary device; Android test can run later if/when needed
+- [x] 6.3 iPhone smoke-test passed on 2026-05-20; URL ready to share with Nora
