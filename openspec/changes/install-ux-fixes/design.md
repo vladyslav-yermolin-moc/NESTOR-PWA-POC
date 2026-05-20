@@ -133,11 +133,13 @@ No structural HTML changes. The native iOS date / number pickers still open on t
 
 The choice is to ship a minimal, in-place CSS resize that addresses the immediate Nora-facing issue and leaves space for a richer redesign later if scope expands.
 
-### Decision: `localStorage` dismissal memory
+### Decision: `sessionStorage` dismissal memory (per-tab-session, not permanent)
 
 **Context:** Once a user dismisses the banner, it should not re-appear on every navigation. The POC has no backend so server-side preference storage is unavailable.
 
-**Decision:** Set `localStorage['nestor-install-dismissed'] = '1'` on dismissal. On page load, return early if that key is present. No expiry — dismissed forever (until the user clears site data).
+**Decision:** Set `sessionStorage['nestor-install-dismissed'] = '1'` on dismissal. On page load, return early if that key is present. The flag is cleared automatically when the browser tab/window is closed — next session re-shows the banner.
+
+Rationale: Vlad chose sessionStorage scope on 2026-05-20 after observing that a permanent localStorage dismiss is too aggressive for a POC with a single key reviewer (Nora). For a production rollout this can be revisited (TTL of N days, or back to localStorage).
 
 **Rationale:** Simplest dismissal pattern that survives reloads and re-visits. Acceptable for a POC; for production a TTL or a "ask me later" path could be added. The dismissal applies per origin per browser profile, which is the right granularity for an install banner.
 
@@ -154,7 +156,7 @@ SW registration fires (existing) ──► SW activates, caches shell
    ▼
 Inline IIFE runs
    │
-   ├── localStorage['nestor-install-dismissed'] === '1'? ──► return (no banner)
+   ├── sessionStorage['nestor-install-dismissed'] === '1'? ──► return (no banner)
    │
    ├── matchMedia('(display-mode: standalone)') OR navigator.standalone? ──► return (already installed)
    │
@@ -168,7 +170,7 @@ Inline IIFE runs
                        + banner.hidden = false
                        + on button click: deferredPrompt.prompt()
                             └── on userChoice 'accepted' or 'dismissed':
-                                 dismiss banner + localStorage flag
+                                 dismiss banner + sessionStorage flag
 ```
 
 ### Standalone-mode CSS resolution
@@ -203,7 +205,7 @@ No new files. No deletions. No new directories.
 
 - **ADR-001 (Tech Stack):** vanilla CSS + vanilla JS, inline, no build step, no npm dependency. ✓
 - **ADR-002 (Architecture):** still one `index.html`, still root-scoped, no new routes. ✓
-- **ADR-003 (Data Storage):** `localStorage` is permitted for transient UI state per ADR-003's deferred-aspect language — the dismissal flag qualifies. ✓
+- **ADR-003 (Data Storage):** `sessionStorage` is permitted for transient UI state per ADR-003's deferred-aspect language — the dismissal flag qualifies (even more clearly than localStorage would, since session-scoped is the most transient of the storage tiers). ✓
 - **ADR-004 (API / Auth):** no API calls, no auth. ✓
 - **ADR-005 (Deployment):** all paths still relative, no infra change. ✓
 - **ADR-006 (Testing):** manual smoke test on real iPhone re-runs. ✓

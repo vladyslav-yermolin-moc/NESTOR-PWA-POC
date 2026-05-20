@@ -1307,7 +1307,7 @@
 <script>
   (function () {
     var STORAGE_KEY = 'nestor-install-dismissed';
-    if (localStorage.getItem(STORAGE_KEY) === '1') return;
+    if (sessionStorage.getItem(STORAGE_KEY) === '1') return;
 
     var isStandalone = window.matchMedia('(display-mode: standalone)').matches
                        || window.navigator.standalone === true;
@@ -1322,7 +1322,7 @@
 
     closeBtn.addEventListener('click', function () {
       banner.hidden = true;
-      try { localStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
+      try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
     });
 
     if (isIOS) {
@@ -1364,7 +1364,7 @@
           deferredPrompt.userChoice.then(function (choice) {
             if (choice.outcome === 'accepted') {
               banner.hidden = true;
-              try { localStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
+              try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
             }
             deferredPrompt = null;
           });

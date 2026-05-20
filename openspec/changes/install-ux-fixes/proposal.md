@@ -30,7 +30,7 @@ This change addresses all four. The fixes are additive (per ADR-001's "PWA featu
 - **Modify `index.html`**: append a third additive block just before `</body>` (alongside the existing SW-registration `<script>`):
   - A `<div id="install-banner" hidden>` that lives as a fixed-position bottom-of-screen banner with the inline `<style>` and `<script>` to drive it.
   - The `<script>` detects: (a) already-installed → return immediately; (b) iOS Safari (UA check) → render iOS Share-icon + "Tap Share → Add to Home Screen"; (c) Android Chrome → capture `beforeinstallprompt`, render an in-banner "Install" button that calls `prompt()`; (d) desktop or other → no banner.
-  - Dismiss button (×) sets `localStorage['nestor-install-dismissed'] = '1'` so the banner does not re-appear after the user closes it.
+  - Dismiss button (×) sets `sessionStorage['nestor-install-dismissed'] = '1'` so the banner stays hidden for the rest of the browser session (closing the tab clears it; the next session re-shows it).
   - Hidden by an inner `@media (display-mode: standalone), (display-mode: fullscreen) { display: none !important; }` so it never shows in the installed app, only in the browser tab view.
 
 **Mobile browser-mode layout (Issue 3):**
@@ -61,7 +61,7 @@ No prototype markup, screen JS, or screen flow is modified.
 - Extending the `@media` trigger to include `(max-width: 480px)` so mobile browser tabs (Chrome / Safari on real phones) also get the fullscreen-fill layout, eliminating the phone-frame box-shadow that caused horizontal overflow on iPhone 16 Pro.
 - Adding `overflow-x: hidden` on `html, body` as a global horizontal-scroll safety net.
 - Adding an iOS / Android install-guidance banner (HTML + inline CSS + inline JS) to `index.html` only, between the prototype content and `</body>`.
-- localStorage-based dismissal memory so the banner is shown once per browser/session unless cleared.
+- sessionStorage-based dismissal memory so the banner is shown once per browser tab session (re-appears when the user closes the tab and re-opens the URL — suitable for the POC where Nora may want to see the banner again across visits).
 - Hidden-in-standalone behavior so the banner never appears inside the installed PWA.
 - Enlarging the showing-scheduling modal's date input + time / AM-PM selects to iOS-friendly sizing (16px font, 48px min-height, larger calendar icon) so the inputs read as real affordances on iPhone.
 
@@ -95,7 +95,7 @@ No prototype markup, screen JS, or screen flow is modified.
 - *Banner shows under cached/stale state.* If a visitor previously dismissed the banner under the old (broken-layout) deploy, they'll still see the dismissal flag from before. Acceptable for the POC — fresh visitors test the new banner; previously dismissed users can clear site data to re-test. Documented in tasks/smoke-test.
 - *`100dvh` not supported in very old browsers.* All targeted browsers (iOS Safari 17+, Chrome 120+) support `dvh`. Fallback `height: 100vh` keeps older browsers functional; on iOS Safari < 16 the bottom may still get clipped, but those are out of our targeted matrix.
 - *Banner contains text/markup not in the prototype source.* This is the third PWA-specific addition to `index.html`. The canonical spec `openspec/specs/pwa-shell/spec.md` constrains additions to two categories (head tags + SW-reg script). This change extends that allowlist in a spec delta — captured in `specs/pwa-shell/spec.md` as a MODIFIED requirement.
-- *`localStorage` is the only dismissal-persistence layer.* If iOS Safari clears site data (e.g., Settings → Safari → Clear History), the banner re-appears. Acceptable for the POC.
+- *Dismissal is sessionStorage-scoped, not permanent.* Closing the tab/window clears the flag; the next session re-shows the banner. This was chosen deliberately for the POC so Nora (a single key user) can re-see the banner without manually clearing site data. For production a TTL or `localStorage` swap could be considered.
 
 - *Desktop browser walkthroughs lose the phone-frame at narrow viewports.* The new `(max-width: 480px)` trigger fullscreen-fills any viewport ≤ 480px. A desktop window dragged below 480px wide will lose the phone preview. Acceptable — desktop walkthroughs happen on full-width windows; the breakpoint protects the on-device case where it actually matters.
 

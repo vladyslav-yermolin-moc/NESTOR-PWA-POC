@@ -16,7 +16,7 @@
 
 - [x] 4.1 Append the `<style>` block defining `.install-banner` + `.install-banner-close` + `.install-banner-title` + `.install-banner-btn` + `.ios-share-icon` + inner `@media (display-mode: standalone)` hide — [plan §Phase 4] / [spec: Banner hidden inside installed PWA]
 - [x] 4.2 Append the `<div id="install-banner" hidden>` containing close button and content area — [plan §Phase 4]
-- [x] 4.3 Append the IIFE `<script>` implementing: early return on dismissal or standalone, UA-based iOS detection with Share-icon copy, Android `beforeinstallprompt` capture + Install button, localStorage dismissal — [plan §Phase 4] / [spec: Banner appears in browser view on iPhone Safari + Banner dismissal persists across reloads + Android Chrome shows in-banner Install button + Desktop browser shows no banner + Already-installed user does not see the banner]
+- [x] 4.3 Append the IIFE `<script>` implementing: early return on dismissal or standalone, UA-based iOS detection with Share-icon copy, Android `beforeinstallprompt` capture + Install button, sessionStorage dismissal (per-tab-session) — [plan §Phase 4] / [spec: Banner appears in browser view on iPhone Safari + Banner dismissal persists within the browser session + Android Chrome shows in-banner Install button + Desktop browser shows no banner + Already-installed user does not see the banner]
 
 ## Phase 5: Mobile-viewport fullscreen trigger + horizontal-scroll safety net
 

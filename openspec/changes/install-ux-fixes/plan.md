@@ -219,7 +219,7 @@ Open `index.html`, find the existing standalone-mode block, replace it with the 
 <script>
   (function () {
     var STORAGE_KEY = 'nestor-install-dismissed';
-    if (localStorage.getItem(STORAGE_KEY) === '1') return;
+    if (sessionStorage.getItem(STORAGE_KEY) === '1') return;
 
     var isStandalone = window.matchMedia('(display-mode: standalone)').matches
                        || window.navigator.standalone === true;
@@ -234,7 +234,7 @@ Open `index.html`, find the existing standalone-mode block, replace it with the 
 
     closeBtn.addEventListener('click', function () {
       banner.hidden = true;
-      try { localStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
+      try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
     });
 
     if (isIOS) {
@@ -274,7 +274,7 @@ Open `index.html`, find the existing standalone-mode block, replace it with the 
           deferredPrompt.userChoice.then(function (choice) {
             if (choice.outcome === 'accepted') {
               banner.hidden = true;
-              try { localStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
+              try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
             }
             deferredPrompt = null;
           });
@@ -290,7 +290,7 @@ Open `index.html`, find the existing standalone-mode block, replace it with the 
 - The block is appended after the SW-registration `<script>`, before `</body>`.
 - Opening `index.html` via `file://` does not show the banner (UA detection treats most desktop contexts as no-banner; iOS desktop simulation may show it, which is acceptable).
 - In a real mobile Safari load, the banner appears after ~1.5 seconds with iOS-specific content.
-- Tapping × hides the banner and sets `localStorage['nestor-install-dismissed']` to `'1'`.
+- Tapping × hides the banner and sets `sessionStorage['nestor-install-dismissed']` to `'1'` (cleared automatically on tab/window close).
 - On reload after dismissal, the banner does NOT re-appear.
 - The `@media (display-mode: standalone)` rule inside the banner's `<style>` hides the banner inside the installed PWA.
 - Maps to spec scenarios: **"Platform-Aware Install Guidance Banner → Banner appears in browser view on iPhone Safari"**, **"Banner hidden inside installed PWA"**, **"Banner dismissal persists across reloads"**, **"Android Chrome shows in-banner Install button"**, **"Desktop browser shows no banner"**, **"Already-installed user does not see the banner"**.

@@ -111,7 +111,7 @@ On Android (or any browser that fires `beforeinstallprompt`): the banner MUST ca
 #### Scenario: Banner appears in browser view on iPhone Safari
 
 - **GIVEN** a first-time visitor opens the deployed URL in mobile Safari on iOS 17+
-- **AND** `localStorage['nestor-install-dismissed']` is not set
+- **AND** `sessionStorage['nestor-install-dismissed']` is not set
 - **WHEN** the page finishes loading and the activation script runs
 - **THEN** the banner MUST become visible within 3 seconds after `load`
 - **AND** the banner MUST contain the iOS share icon (SVG inline)
@@ -125,13 +125,14 @@ On Android (or any browser that fires `beforeinstallprompt`): the banner MUST ca
 - **AND** the banner element MUST NOT be visible to the user
 - **AND** the `display` computed style of `.install-banner` MUST be `none`
 
-#### Scenario: Banner dismissal persists across reloads
+#### Scenario: Banner dismissal persists within the browser session
 
 - **GIVEN** the banner is visible
 - **WHEN** the user taps the × close button
-- **THEN** `localStorage['nestor-install-dismissed']` MUST be set to `'1'`
+- **THEN** `sessionStorage['nestor-install-dismissed']` MUST be set to `'1'`
 - **AND** the banner MUST be hidden immediately
-- **AND** on subsequent page loads the banner MUST NOT re-appear until the localStorage flag is cleared
+- **AND** on subsequent page loads within the same browser session (tab/window not closed) the banner MUST NOT re-appear
+- **AND** when the user closes the tab/window and re-opens the URL in a new session, the banner MUST re-appear (sessionStorage is cleared per-session, by design — see the dismissal-behavior decision in `design.md`)
 
 #### Scenario: Android Chrome shows in-banner Install button
 
@@ -142,7 +143,7 @@ On Android (or any browser that fires `beforeinstallprompt`): the banner MUST ca
 - **AND** the captured event MUST be stored
 - **AND** the banner MUST appear with an "Install" button
 - **AND** when the user taps "Install", `event.prompt()` MUST be called
-- **AND** on user acceptance, the banner MUST hide and `localStorage['nestor-install-dismissed']` MUST be set
+- **AND** on user acceptance, the banner MUST hide and `sessionStorage['nestor-install-dismissed']` MUST be set
 
 #### Scenario: Desktop browser shows no banner
 
