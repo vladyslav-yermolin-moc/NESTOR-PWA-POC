@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>NestorAI — Prototype</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1F2937">
@@ -21,6 +21,7 @@
     color: #111827;
     background: radial-gradient(circle at 50% 50%, #fff, transparent 70%), linear-gradient(180deg, #F3F4F6, #E5E7EB);
     display: flex; align-items: center; justify-content: center;
+    overflow-x: hidden;
   }
 
   .screen { display: none; animation: fadeIn 0.25s ease; }
@@ -295,19 +296,19 @@
   }
   .showing-date-input {
     width: 100%; border: 1px solid #D1D5DB; border-radius: 10px;
-    padding: 10px 38px 10px 12px; font-size: 13px; color: #374151;
+    padding: 14px 44px 14px 14px; font-size: 16px; min-height: 48px; color: #374151;
     font-family: inherit; outline: none; appearance: none; -webkit-appearance: none;
     background: #fff;
   }
   .showing-date-input:focus { border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
   .showing-date-icon {
-    position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
-    color: #9CA3AF; pointer-events: none; font-size: 15px;
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    color: #9CA3AF; pointer-events: none; font-size: 20px;
   }
   .showing-time-row { display: flex; gap: 8px; margin-bottom: 14px; }
   .showing-time-select {
     flex: 1; border: 1px solid #D1D5DB; border-radius: 10px;
-    padding: 10px 12px; font-size: 13px; color: #374151;
+    padding: 14px 12px; font-size: 16px; min-height: 48px; color: #374151;
     font-family: inherit; outline: none; background: #fff;
     appearance: none; -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -315,9 +316,9 @@
     padding-right: 30px;
   }
   .showing-ampm-select {
-    width: 90px; flex-shrink: 0;
+    width: 110px; flex-shrink: 0;
     border: 1px solid #D1D5DB; border-radius: 10px;
-    padding: 10px 12px; font-size: 13px; color: #374151;
+    padding: 14px 12px; font-size: 16px; min-height: 48px; color: #374151;
     font-family: inherit; outline: none; background: #fff;
     appearance: none; -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -349,13 +350,22 @@
   /* Standalone PWA (installed on home screen): drop the desktop phone-frame chrome
      so the prototype fills the actual device viewport instead of rendering as a
      phone-inside-a-phone. Browser tab view is unaffected. */
-  @media (display-mode: standalone), (display-mode: fullscreen) {
-    html, body { background: #FFFFFF; }
+  @media (display-mode: standalone), (display-mode: fullscreen), (max-width: 480px) {
+    html, body {
+      background: #FFFFFF;
+      display: block;
+    }
     .phone {
       width: 100%;
-      height: 100%;
+      height: 100vh;
+      height: 100dvh;
       border-radius: 0;
       box-shadow: none;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      box-sizing: border-box;
     }
   }
 </style>
@@ -1214,6 +1224,107 @@
       });
     });
   }
+</script>
+
+<style>
+  .install-banner {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    max-width: 380px;
+    margin: 0 auto;
+    background: #1F2937;
+    color: #fff;
+    border-radius: 14px;
+    padding: 14px 36px 14px 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    z-index: 1000;
+    font-size: 13px;
+    line-height: 1.5;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  .install-banner[hidden] { display: none; }
+  .install-banner-close {
+    position: absolute; top: 6px; right: 8px;
+    background: transparent; border: none; color: #fff;
+    font-size: 20px; line-height: 1; cursor: pointer;
+    padding: 4px 8px;
+  }
+  .install-banner-title { font-weight: 600; margin-bottom: 4px; }
+  .install-banner-btn {
+    margin-top: 10px;
+    background: #fff; color: #1F2937;
+    border: none; padding: 8px 14px;
+    border-radius: 8px; font-weight: 600;
+    font-size: 13px; cursor: pointer;
+    font-family: inherit;
+  }
+  .ios-share-icon {
+    display: inline-block; vertical-align: -3px;
+    width: 14px; height: 14px;
+  }
+  @media (display-mode: standalone), (display-mode: fullscreen) {
+    .install-banner { display: none !important; }
+  }
+</style>
+
+<div id="install-banner" hidden>
+  <button class="install-banner-close" aria-label="Dismiss">×</button>
+  <div class="install-banner-content"></div>
+</div>
+
+<script>
+  (function () {
+    var STORAGE_KEY = 'nestor-install-dismissed';
+    if (localStorage.getItem(STORAGE_KEY) === '1') return;
+
+    var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                       || window.navigator.standalone === true;
+    if (isStandalone) return;
+
+    var ua = navigator.userAgent;
+    var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+
+    var banner = document.getElementById('install-banner');
+    var content = banner.querySelector('.install-banner-content');
+    var closeBtn = banner.querySelector('.install-banner-close');
+
+    closeBtn.addEventListener('click', function () {
+      banner.hidden = true;
+      try { localStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
+    });
+
+    if (isIOS) {
+      content.innerHTML =
+        '<div class="install-banner-title">Install NestorAI</div>' +
+        'Tap <svg class="ios-share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M12 2v14"/><path d="M5 9l7-7 7 7"/><path d="M5 21h14v-7"/></svg> ' +
+        'below, then <strong>Add to Home Screen</strong> for the full app experience.';
+      setTimeout(function () { banner.hidden = false; }, 1500);
+    } else {
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        var deferredPrompt = e;
+        content.innerHTML =
+          '<div class="install-banner-title">Install NestorAI</div>' +
+          'Install NestorAI as an app for a faster, fullscreen experience.' +
+          '<br><button class="install-banner-btn" id="install-trigger">Install</button>';
+        banner.hidden = false;
+        document.getElementById('install-trigger').addEventListener('click', function () {
+          if (!deferredPrompt) return;
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(function (choice) {
+            if (choice.outcome === 'accepted') {
+              banner.hidden = true;
+              try { localStorage.setItem(STORAGE_KEY, '1'); } catch (_) {}
+            }
+            deferredPrompt = null;
+          });
+        });
+      });
+    }
+  })();
 </script>
 
 </body>
