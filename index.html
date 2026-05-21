@@ -68,7 +68,7 @@
     border-top: 1px solid #F3F4F6; padding: 12px 14px;
     display: flex; align-items: center; gap: 10px;
     background: #FAFAFA;
-    font-size: 13px; color: #6B7280;
+    font-size: 15px; color: #6B7280;
     border: 1px solid #E5E7EB;
     border-radius: 12px;
     margin: 12px;
@@ -76,19 +76,19 @@
   }
   .phone-footer {
     background: #6B7280; color: #fff; padding: 8px 16px;
-    font-size: 9px; line-height: 1.4; text-align: center;
+    font-size: 12px; line-height: 1.4; text-align: center;
     flex-shrink: 0;
   }
 
   /* Chat bubbles */
   .bubble-bot {
     background: #F3F4F6; padding: 10px 12px; border-radius: 14px 14px 14px 4px;
-    font-size: 13px; line-height: 1.45; max-width: 85%;
+    font-size: 15px; line-height: 1.45; max-width: 85%;
     margin-bottom: 8px;
   }
   .bubble-user {
     background: #1F2937; color: #fff; padding: 10px 12px; border-radius: 14px 14px 4px 14px;
-    font-size: 13px; line-height: 1.45; max-width: 85%;
+    font-size: 15px; line-height: 1.45; max-width: 85%;
     margin-bottom: 8px; margin-left: auto;
   }
 
@@ -101,10 +101,10 @@
     height: 80px; background: linear-gradient(135deg, #E5E7EB, #F3F4F6);
     border-radius: 8px; margin-bottom: 8px;
     display: flex; align-items: center; justify-content: center;
-    color: #9CA3AF; font-size: 10px;
+    color: #9CA3AF; font-size: 13px;
   }
-  .price { font-weight: 600; font-size: 13px; }
-  .meta { color: #6B7280; font-size: 11px; }
+  .price { font-weight: 600; font-size: 15px; }
+  .meta { color: #6B7280; font-size: 14px; }
 
   /* Chips */
   .chip {
@@ -123,19 +123,26 @@
     background: #1F2937; color: #fff;
   }
   .action-btn.free { background: #fff; color: #1F2937; }
-  .action-btn .lock { font-size: 10px; font-weight: 500; opacity: 0.85; }
+  .action-btn .lock { font-size: 13px; font-weight: 500; opacity: 0.85; }
 
   /* Clickable hotspot */
   [data-goto],
-  [onclick="back()"] {
+  [onclick="back()"],
+  [onclick="openShowingModal()"],
+  [onclick^="changeMapRadius"] {
     cursor: pointer; position: relative; transition: transform 0.15s;
     box-shadow: 0 0 0 2px #3B82F6;
   }
   [data-goto]:hover,
-  [onclick="back()"]:hover { transform: scale(1.02); }
+  [onclick="back()"]:hover,
+  [onclick="openShowingModal()"]:hover,
+  [onclick^="changeMapRadius"]:hover { transform: scale(1.02); }
   .showing-modal-close,
   .showing-cancel-btn,
-  .showing-generate-btn { box-shadow: 0 0 0 2px #3B82F6; }
+  .showing-generate-btn,
+  .showing-date-input,
+  .showing-time-select,
+  .showing-ampm-select { box-shadow: 0 0 0 2px #3B82F6; }
 
   /* Typing dots */
   @keyframes typingDot {
@@ -153,7 +160,7 @@
   /* Disclosure block */
   .disclosure {
     background: #FAFAFA; border: 1px solid #E5E7EB; border-radius: 10px;
-    padding: 12px; font-size: 11px; line-height: 1.5; color: #374151;
+    padding: 12px; font-size: 14px; line-height: 1.5; color: #374151;
     margin-bottom: 8px;
   }
   .disclosure-title {
@@ -178,15 +185,15 @@
   }
   .tier-name { font-weight: 700; color: #111827; font-size: 14px; margin-bottom: 4px; }
   .tier-price { font-size: 12px; color: #6B7280; margin-bottom: 8px; }
-  .tier ul { padding-left: 16px; margin: 0; font-size: 11px; line-height: 1.6; color: #374151; }
+  .tier ul { padding-left: 16px; margin: 0; font-size: 14px; line-height: 1.6; color: #374151; }
 
   /* Utility classes */
   .text-link { color: #2563EB; }
   .text-muted { color: #6B7280; }
   .text-ok { color: #10B981; }
   .text-bad { color: #EF4444; }
-  .text-xs { font-size: 11px; }
-  .text-sm { font-size: 13px; }
+  .text-xs { font-size: 14px; }
+  .text-sm { font-size: 15px; }
   .text-lg { font-size: 16px; }
   .text-2xl { font-size: 20px; }
   .font-semibold { font-weight: 600; }
@@ -293,8 +300,8 @@
   }
   .showing-property-info { flex: 1; min-width: 0; }
   .showing-property-price { font-weight: 700; font-size: 16px; color: #111827; }
-  .showing-property-address { font-size: 11px; color: #374151; margin-top: 2px; line-height: 1.3; }
-  .showing-property-agent { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+  .showing-property-address { font-size: 14px; color: #374151; margin-top: 2px; line-height: 1.3; }
+  .showing-property-agent { font-size: 14px; color: #9CA3AF; margin-top: 2px; }
 
   .showing-field-label {
     font-size: 12px; font-weight: 600; color: #111827; margin-bottom: 6px;
@@ -341,7 +348,7 @@
     margin-top: 4px;
   }
   .showing-cancel-btn {
-    background: none; border: none; font-size: 13px; font-weight: 500;
+    background: none; border: none; font-size: 15px; font-weight: 500;
     color: #374151; cursor: pointer; padding: 8px 12px;
     border-radius: 8px; font-family: inherit;
   }
@@ -350,7 +357,7 @@
     display: flex; align-items: center; gap: 7px;
     background: #1F2937; color: #fff; border: none;
     padding: 10px 16px; border-radius: 10px;
-    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-size: 15px; font-weight: 600; cursor: pointer;
     font-family: inherit;
   }
   .showing-generate-btn:hover { background: #374151; }
@@ -474,25 +481,25 @@
             I found <strong>14 homes</strong> in Mount Pleasant under $700k.
           </div>
         </div>
-        <div class="flex gap-1 flex-wrap mb-2" style="font-size:10px;">
-          <span class="chip" style="padding: 4px 8px; font-size: 10px;">Home Type ⌄</span>
-          <span class="chip" style="padding: 4px 8px; font-size: 10px;">Price ⌄</span>
-          <span class="chip" style="padding: 4px 8px; font-size: 10px;">Beds &amp; Baths ⌄</span>
+        <div class="flex gap-1 flex-wrap mb-2" style="font-size: 13px;">
+          <span class="chip" style="padding: 4px 8px; font-size: 13px;">Home Type ⌄</span>
+          <span class="chip" style="padding: 4px 8px; font-size: 13px;">Price ⌄</span>
+          <span class="chip" style="padding: 4px 8px; font-size: 13px;">Beds &amp; Baths ⌄</span>
         </div>
         <div class="text-xs flex justify-between mb-3">
           <a class="text-link underline">Reset filters</a>
           <a class="text-link underline">Save Search</a>
         </div>
-        <div class="text-muted mb-1" style="font-size:10px;">Tap a card to open →</div>
+        <div class="text-muted mb-1" style="font-size: 13px;">Tap a card to open →</div>
         <div class="lc" data-goto="4">
-          <div class="flex justify-between mb-1 text-muted" style="font-size:10px;">Detached <span>♡</span></div>
+          <div class="flex justify-between mb-1 text-muted" style="font-size: 13px;">Detached <span>♡</span></div>
           <div class="lc-img">📷 1/20</div>
           <div class="price">$649,000</div>
           <div class="meta">410 Hibben St</div>
           <div class="meta">3bd · 2ba · 1,840 sqft</div>
         </div>
         <div class="lc" data-goto="4">
-          <div class="flex justify-between mb-1 text-muted" style="font-size:10px;">Detached <span>♡</span></div>
+          <div class="flex justify-between mb-1 text-muted" style="font-size: 13px;">Detached <span>♡</span></div>
           <div class="lc-img">📷 1/18</div>
           <div class="price">$695,000</div>
           <div class="meta">22 Bowman Rd</div>
@@ -527,9 +534,9 @@
           <div style="height: 30px; width: 30px;" class="lc-img">📷</div>
           <div style="height: 30px; width: 30px;" class="lc-img">📷</div>
         </div>
-        <div class="text-muted" style="font-size:10px;">Listing price</div>
+        <div class="text-muted" style="font-size: 13px;">Listing price</div>
         <div class="text-lg font-bold">$649,000</div>
-        <div class="text-muted" style="font-size:10px;">Last price change: 21 days ago · On market: 31 days</div>
+        <div class="text-muted" style="font-size: 13px;">Last price change: 21 days ago · On market: 31 days</div>
 
         <div class="mt-3 space-y-1">
           <button class="action-btn" onclick="openShowingModal()">
@@ -672,18 +679,18 @@
       <div class="phone-content">
         <div class="bubble-bot">Here's a draft email to the listing agent for your showing request.</div>
         <div class="border border-line rounded-xl p-3 mb-2 bg-white">
-          <div class="text-muted" style="font-size:10px;">To: Alex Morgan · Charleston Realty</div>
-          <div class="text-muted" style="font-size:10px;" id="showingEmailSubject">Subject: Showing request — 410 Hibben St</div>
+          <div class="text-muted" style="font-size: 13px;">To: Alex Morgan · Charleston Realty</div>
+          <div class="text-muted" style="font-size: 13px;" id="showingEmailSubject">Subject: Showing request — 410 Hibben St</div>
           <div class="text-xs mt-2 leading-relaxed" style="color:#374151;">
             Hi Alex,<br><br>
             My client would like to schedule a showing for 410 Hibben St (MLS SC-310123) on <strong id="showingEmailDateText">the requested date</strong> at <strong id="showingEmailTimeText">the requested time</strong>. Please let us know if this works or suggest an alternate time.<br><br>
             Thank you,<br>
             Nestor (on behalf of buyer)<br><br>
-            <span style="color:#6B7280; font-size:10px; font-style:italic;">
+            <span style="color:#6B7280; font-size: 13px; font-style:italic;">
             — Nestor is the technology tool operating under NovaCasa Brokerage as a Transaction Broker as permitted in the state of South Carolina.
             </span>
           </div>
-          <div class="mt-3 flex gap-2" style="font-size:10px;">
+          <div class="mt-3 flex gap-2" style="font-size: 13px;">
             <span class="px-2 py-1 bg-soft rounded" style="cursor:pointer;">Edit</span>
             <span class="px-2 py-1 bg-ink text-white rounded font-medium" style="cursor:pointer;" data-goto="17">Send</span>
           </div>
@@ -722,7 +729,7 @@
         </div>
         <button class="w-full bg-ink text-white rounded-lg py-3 text-sm font-medium mb-2" style="border:0; cursor:pointer;" data-goto="" onclick="gotoFromPaywall()">Start free trial</button>
         <button class="w-full text-white rounded-lg py-3 text-sm font-medium" style="background:#000; border:0; cursor:pointer;" data-goto="" onclick="gotoFromPaywall()">Pay</button>
-        <div class="mt-2 text-center text-muted" style="font-size:10px;">
+        <div class="mt-2 text-center text-muted" style="font-size: 13px;">
           <a class="text-link underline" data-goto="16">See full pricing details</a>
         </div>
       </div>
@@ -741,7 +748,7 @@
       <div class="phone-content">
         <div class="text-sm font-semibold mb-1">Prepare an offer</div>
         <div class="text-xs text-muted mb-3">Upload your pre-approval letter so Nestor can include it in the offer bundle.</div>
-        <div class="flex gap-1 mb-3 flex-wrap" style="font-size:10px;">
+        <div class="flex gap-1 mb-3 flex-wrap" style="font-size: 13px;">
           <span class="chip" style="padding: 4px 8px;">Quick CMA</span>
           <span class="chip" style="padding: 4px 8px;">Offer Info Sheet</span>
           <span class="chip chip-selected" style="padding: 4px 8px;">Pre-approval</span>
@@ -750,7 +757,7 @@
         <div class="border-2 border-dashed border-line rounded-lg p-4 text-center mb-3">
           <div style="font-size:22px;" class="mb-1">📷</div>
           <div class="text-xs font-medium">Take photo or upload</div>
-          <div class="text-muted mt-1" style="font-size:10px;">PDF, JPG, PNG · up to 10MB</div>
+          <div class="text-muted mt-1" style="font-size: 13px;">PDF, JPG, PNG · up to 10MB</div>
         </div>
         <div class="bg-soft rounded-lg p-3 mb-2">
           <div class="flex items-center gap-2 mb-2">
@@ -760,7 +767,7 @@
           <div class="h-1 rounded overflow-hidden" style="background:#E5E7EB;">
             <div class="h-full" style="background:#10B981; width: 70%; animation: progress 2s ease-in-out infinite;"></div>
           </div>
-          <div class="text-muted mt-1" style="font-size:10px;">Verifying with AI…</div>
+          <div class="text-muted mt-1" style="font-size: 13px;">Verifying with AI…</div>
         </div>
         <div class="border rounded-lg p-3 text-xs" style="background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.3);" data-goto="9">
           <div class="font-medium text-ok mb-1">✓ Verified — tap to continue</div>
@@ -781,8 +788,8 @@
       </div>
       <div class="phone-content" style="padding-top: 8px;">
         <div class="text-sm font-semibold">Prepare your offer</div>
-        <div class="text-muted mb-2" style="font-size:10px;">Enter your offer terms below. Nestor will format and send them to the listing agent to prepare the official contract.</div>
-        <div class="flex gap-1 flex-wrap mb-2" style="font-size:10px;">
+        <div class="text-muted mb-2" style="font-size: 13px;">Enter your offer terms below. Nestor will format and send them to the listing agent to prepare the official contract.</div>
+        <div class="flex gap-1 flex-wrap mb-2" style="font-size: 13px;">
           <span class="chip chip-selected" style="padding: 4px 8px;">Offer terms</span>
           <span class="chip" style="padding: 4px 8px;">Pre-approval</span>
           <span class="chip" style="padding: 4px 8px;">Proof of funds</span>
@@ -790,14 +797,14 @@
         <div class="border border-line rounded p-2 mb-2 text-xs">
           <div class="text-muted">Property</div>
           <div class="font-medium">410 Hibben St, Mount Pleasant SC</div>
-          <div class="text-muted" style="font-size:10px;">$649,000 · MLS SC-310123</div>
+          <div class="text-muted" style="font-size: 13px;">$649,000 · MLS SC-310123</div>
         </div>
         <div class="space-y-2 text-xs">
-          <div><div class="text-muted" style="font-size:10px;">Purchase price</div><div class="border-b py-1">$640,000</div></div>
-          <div><div class="text-muted" style="font-size:10px;">Earnest money</div><div class="border-b py-1">$5,000 · check · seller's attorney</div></div>
-          <div><div class="text-muted" style="font-size:10px;">Financing</div><div class="border-b py-1">Conventional · 80% LTV · Palmetto Bank</div></div>
-          <div><div class="text-muted" style="font-size:10px;">Closing date</div><div class="border-b py-1">Oct 31, 2026</div></div>
-          <div><div class="text-muted" style="font-size:10px;">Seller concession</div><div class="border-b py-1">$5,000 · general closing costs</div></div>
+          <div><div class="text-muted" style="font-size: 13px;">Purchase price</div><div class="border-b py-1">$640,000</div></div>
+          <div><div class="text-muted" style="font-size: 13px;">Earnest money</div><div class="border-b py-1">$5,000 · check · seller's attorney</div></div>
+          <div><div class="text-muted" style="font-size: 13px;">Financing</div><div class="border-b py-1">Conventional · 80% LTV · Palmetto Bank</div></div>
+          <div><div class="text-muted" style="font-size: 13px;">Closing date</div><div class="border-b py-1">Oct 31, 2026</div></div>
+          <div><div class="text-muted" style="font-size: 13px;">Seller concession</div><div class="border-b py-1">$5,000 · general closing costs</div></div>
         </div>
         <button class="w-full bg-ink text-white rounded-lg py-2 text-xs font-medium mt-3" style="border:0; cursor:pointer;" data-goto="10">Continue</button>
       </div>
@@ -847,7 +854,7 @@
       </div>
       <div class="phone-content">
         <div class="text-sm font-semibold mb-1">Bundle and send</div>
-        <div class="text-muted mb-3" style="font-size:10px;">All offer terms and supporting documents to the listing agent.</div>
+        <div class="text-muted mb-3" style="font-size: 13px;">All offer terms and supporting documents to the listing agent.</div>
         <div class="space-y-1 text-xs mb-3">
           <div class="flex justify-between p-2 border border-line rounded"><span>Quick CMA (PDF)</span><span class="text-ok">✓</span></div>
           <div class="flex justify-between p-2 border border-line rounded"><span>Offer terms summary</span><span class="text-ok">✓</span></div>
@@ -855,9 +862,9 @@
           <div class="flex justify-between p-2 border border-line rounded"><span>Proof of funds</span><span class="text-ok">✓</span></div>
           <div class="flex justify-between p-2 border border-line rounded"><span>Seller concession: $5,000</span><span class="text-ok">✓</span></div>
         </div>
-        <div class="text-muted" style="font-size:10px;">To (listing agent)</div>
+        <div class="text-muted" style="font-size: 13px;">To (listing agent)</div>
         <div class="border-b py-1 mb-2 text-xs">alex.morgan@charlestonrealty.com</div>
-        <div class="text-muted" style="font-size:10px;">Subject</div>
+        <div class="text-muted" style="font-size: 13px;">Subject</div>
         <div class="border-b py-1 mb-2 text-xs">Offer for 410 Hibben St — Sarah J.</div>
         <div class="flex gap-2 mt-3">
           <button class="flex-1 rounded py-2 text-xs bg-ink text-white font-medium" style="border:0; cursor:pointer;" data-goto="12">Email bundle</button>
@@ -917,9 +924,9 @@
         </div>
         <div class="text-xs font-semibold mb-2">📇 Contacts</div>
         <div class="border border-line rounded-lg p-3 text-xs mb-3 space-y-2">
-          <div><div class="font-medium">Listing Agent</div><div class="text-muted" style="font-size:10px;">Alex Morgan · Charleston Realty</div></div>
-          <div><div class="font-medium">Closing Attorney</div><div class="text-muted" style="font-size:10px;">Harbor Title Co.</div></div>
-          <div><div class="font-medium">Lender</div><div class="text-muted" style="font-size:10px;">Palmetto Bank Mortgage</div></div>
+          <div><div class="font-medium">Listing Agent</div><div class="text-muted" style="font-size: 13px;">Alex Morgan · Charleston Realty</div></div>
+          <div><div class="font-medium">Closing Attorney</div><div class="text-muted" style="font-size: 13px;">Harbor Title Co.</div></div>
+          <div><div class="font-medium">Lender</div><div class="text-muted" style="font-size: 13px;">Palmetto Bank Mortgage</div></div>
         </div>
         <button class="w-full bg-ink text-white rounded-lg py-2 text-xs font-medium" style="border:0; cursor:pointer;" data-goto="19">Continue to Documents</button>
       </div>
@@ -946,7 +953,7 @@
           <div class="flex justify-between py-1"><span class="text-muted">Total facilitation fee</span><strong>$599</strong></div>
           <div class="flex justify-between py-1"><span class="text-muted">Paid so far (2 × $49)</span><strong>$98</strong></div>
           <div class="flex justify-between py-2"><span class="font-semibold">Charged just now</span><strong style="font-size:14px;">$501</strong></div>
-          <div class="text-muted mt-1" style="font-size:10px;">To Visa •••• 4242 · receipt sent to your email</div>
+          <div class="text-muted mt-1" style="font-size: 13px;">To Visa •••• 4242 · receipt sent to your email</div>
         </div>
         <div class="disclosure" style="background:#ECFDF5; border-color:#A7F3D0;">
           <div style="color:#065F46;">
@@ -1003,7 +1010,7 @@
       <div class="phone-content" style="padding:0; display:flex; flex-direction:column;">
         <div style="padding: 10px 14px; border-bottom: 1px solid #F3F4F6;">
           <div class="text-xs font-semibold">Pick area on map</div>
-          <div class="text-muted" style="font-size:10px;">Drag to move pin · use +/− to adjust radius</div>
+          <div class="text-muted" style="font-size: 13px;">Drag to move pin · use +/− to adjust radius</div>
         </div>
         <div style="position:relative; flex:1; background:#E8EEF3; overflow:hidden;">
           <svg width="100%" height="100%" viewBox="0 0 360 460" preserveAspectRatio="xMidYMid slice" style="display:block;">
@@ -1023,7 +1030,7 @@
             <button onclick="changeMapRadius(20)" style="width:36px; height:36px; border:1px solid #D1D5DB; background:#fff; border-radius:8px; font-size:18px; font-weight:600; cursor:pointer;">+</button>
             <button onclick="changeMapRadius(-20)" style="width:36px; height:36px; border:1px solid #D1D5DB; background:#fff; border-radius:8px; font-size:18px; font-weight:600; cursor:pointer;">−</button>
           </div>
-          <div style="position:absolute; left:12px; bottom:12px; background:#fff; border:1px solid #E5E7EB; border-radius:8px; padding:6px 10px; font-size:11px;">
+          <div style="position:absolute; left:12px; bottom:12px; background:#fff; border:1px solid #E5E7EB; border-radius:8px; padding:6px 10px; font-size: 14px;">
             Radius: <strong id="mapRadiusLabel">2.0 mi</strong>
           </div>
         </div>
@@ -1045,23 +1052,23 @@
       </div>
       <div class="phone-content">
         <div class="text-sm font-semibold mb-1">Documents</div>
-        <div class="text-muted mb-3" style="font-size:10px;">All transaction documents and their status.</div>
+        <div class="text-muted mb-3" style="font-size: 13px;">All transaction documents and their status.</div>
         <div class="text-xs font-semibold mb-1" style="color:#1D4ED8;">✅ Signed in Nestor (onboarding)</div>
-        <div class="border border-line rounded-lg p-2 mb-3" style="font-size:11px;">
-          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Brokerage Relationships Disclosure</span><span class="text-ok" style="font-size:10px;">Signed · May 18</span></div>
-          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Transaction Brokerage Agreement / ToU</span><span class="text-ok" style="font-size:10px;">Signed · May 18</span></div>
-          <div class="flex justify-between py-1"><span>Buyer ack: no buyer-agency comp</span><span class="text-ok" style="font-size:10px;">Signed · May 18</span></div>
+        <div class="border border-line rounded-lg p-2 mb-3" style="font-size: 14px;">
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Brokerage Relationships Disclosure</span><span class="text-ok" style="font-size: 13px;">Signed · May 18</span></div>
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Transaction Brokerage Agreement / ToU</span><span class="text-ok" style="font-size: 13px;">Signed · May 18</span></div>
+          <div class="flex justify-between py-1"><span>Buyer ack: no buyer-agency comp</span><span class="text-ok" style="font-size: 13px;">Signed · May 18</span></div>
         </div>
         <div class="text-xs font-semibold mb-1" style="color:#15803D;">📤 Submitted from you</div>
-        <div class="border border-line rounded-lg p-2 mb-3" style="font-size:11px;">
-          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Proof of Funds / Pre-approval</span><span class="text-ok" style="font-size:10px;">Verified · May 19</span></div>
-          <div class="flex justify-between py-1"><span>Offer summary (SCR310 intent)</span><span class="text-ok" style="font-size:10px;">Sent · May 19</span></div>
+        <div class="border border-line rounded-lg p-2 mb-3" style="font-size: 14px;">
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Proof of Funds / Pre-approval</span><span class="text-ok" style="font-size: 13px;">Verified · May 19</span></div>
+          <div class="flex justify-between py-1"><span>Offer summary (SCR310 intent)</span><span class="text-ok" style="font-size: 13px;">Sent · May 19</span></div>
         </div>
         <div class="text-xs font-semibold mb-1" style="color:#7C2D12;">✍️ Awaiting signature (Dotloop/DocuSign)</div>
-        <div class="border border-line rounded-lg p-2 mb-3" style="font-size:11px;">
-          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Residential Purchase Agreement</span><span style="color:#B45309; font-size:10px;">Listing agent preparing</span></div>
-          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Lead-Based Paint Disclosure</span><span class="text-muted" style="font-size:10px;">Pending</span></div>
-          <div class="flex justify-between py-1"><span>Property Disclosure forms</span><span class="text-muted" style="font-size:10px;">Pending</span></div>
+        <div class="border border-line rounded-lg p-2 mb-3" style="font-size: 14px;">
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Residential Purchase Agreement</span><span style="color:#B45309; font-size: 13px;">Listing agent preparing</span></div>
+          <div class="flex justify-between py-1 border-b" style="border-color:#F3F4F6;"><span>Lead-Based Paint Disclosure</span><span class="text-muted" style="font-size: 13px;">Pending</span></div>
+          <div class="flex justify-between py-1"><span>Property Disclosure forms</span><span class="text-muted" style="font-size: 13px;">Pending</span></div>
         </div>
         <div class="flex gap-2">
           <button class="flex-1 border border-line rounded-lg py-2 text-xs" style="background:#fff; cursor:pointer;">Upload signed docs</button>
@@ -1082,7 +1089,7 @@
       </div>
       <div class="phone-content">
         <div class="text-sm font-semibold mb-1">Homeowner Hub</div>
-        <div class="text-muted mb-3" style="font-size:10px;">Everything in one place</div>
+        <div class="text-muted mb-3" style="font-size: 13px;">Everything in one place</div>
         <div class="text-xs mb-3">📍 410 Hibben St, Mount Pleasant 29464</div>
         <div class="space-y-2 text-xs">
           <div class="border border-line rounded-lg p-3 flex justify-between"><span>🔌 Utilities setup</span><span>+</span></div>
@@ -1090,9 +1097,9 @@
           <div class="border border-line rounded-lg p-3 flex justify-between"><span>🏛 Official links &amp; records</span><span>+</span></div>
           <div class="border border-line rounded-lg p-3 flex justify-between"><span>🔗 My links</span><span>+</span></div>
         </div>
-        <div class="mt-4 p-3 rounded-lg text-center" style="background:#10B981; color:#fff;">
+        <div class="mt-4 p-3 rounded-lg text-center" style="background:#10B981; color:#fff;" data-goto="1">
           <div class="font-semibold text-sm">🎉 End of walkthrough</div>
-          <div class="mt-1" style="font-size:11px; opacity:0.9;">Tap Restart to start over.</div>
+          <div class="mt-1" style="font-size: 14px; opacity:0.9;">Tap to restart flow</div>
         </div>
       </div>
       <div class="phone-footer">Nestor operates under NovaCasa Brokerage as a Transaction Broker in South Carolina. Not legal advice. Buyer responsible for final decisions.</div>
@@ -1276,7 +1283,7 @@
   }
   .install-banner-step {
     display: flex; align-items: center; gap: 10px;
-    font-size: 13px;
+    font-size: 15px;
   }
   .install-banner-step-num {
     flex-shrink: 0;
@@ -1284,7 +1291,7 @@
     background: #374151;
     border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700;
+    font-size: 14px; font-weight: 700;
     color: #fff;
   }
   .install-banner-step-text { flex: 1; }
