@@ -81,5 +81,6 @@ A single global strategy ("cache-first everything" or "network-first everything"
 - Adding a third strategy (e.g., stale-while-revalidate for a new surface) requires a new ADR.
 - Any new cross-origin dependency added to the POC MUST be evaluated against the network-first strategy — if it requires guaranteed offline availability, the SW strategy needs to be revisited.
 - The cache key MUST be the request URL string (no custom keying — Workbox routing is out of scope per the rejection above).
-- The cache name MUST embed a version identifier (currently `nestor-pwa-v1`) so the developer can invalidate stale shell entries by editing `CACHE_VERSION` in the SW source.
+- The cache name MUST embed a version identifier (currently `nestor-pwa-v4`) so the developer can invalidate stale shell entries by editing `CACHE_VERSION` in the SW source.
+- **`CACHE_VERSION` MUST be bumped in the same commit as any change to a file listed in `APP_SHELL`** (currently `index.html`, `manifest.webmanifest`, the two icon PNGs). Cache-first means installed PWAs serve the cached shell forever until the SW file changes byte-wise *and* the new cache name evicts the old entries — skipping the bump ships a deploy that no installed client will ever see. The bump is the deploy mechanism, not optional housekeeping.
 - The SW MUST NOT attempt to synthesize fallback responses (e.g., an "offline.html" page) for failed fetches in the POC — failure passes through to the page. Adding a synthesized offline page requires a new ADR.

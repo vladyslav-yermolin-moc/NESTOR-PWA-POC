@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'nestor-pwa-v3';
+const CACHE_VERSION = 'nestor-pwa-v4';
 
 const APP_SHELL = [
   './',
