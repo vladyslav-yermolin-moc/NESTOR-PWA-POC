@@ -126,8 +126,16 @@
   .action-btn .lock { font-size: 10px; font-weight: 500; opacity: 0.85; }
 
   /* Clickable hotspot */
-  [data-goto] { cursor: pointer; position: relative; transition: transform 0.15s; }
-  [data-goto]:hover { transform: scale(1.02); }
+  [data-goto],
+  [onclick="back()"] {
+    cursor: pointer; position: relative; transition: transform 0.15s;
+    box-shadow: 0 0 0 2px #3B82F6;
+  }
+  [data-goto]:hover,
+  [onclick="back()"]:hover { transform: scale(1.02); }
+  .showing-modal-close,
+  .showing-cancel-btn,
+  .showing-generate-btn { box-shadow: 0 0 0 2px #3B82F6; }
 
   /* Typing dots */
   @keyframes typingDot {
